@@ -1,23 +1,23 @@
 {
-  "name": "@sdd/framework",
+  "name": "@ai-spec-kit/framework",
   "version": "3.0.0",
-  "description": "Spec-Driven Development Framework for AI Agents - v3.0",
+  "description": "AI Spec Kit - Spec-Driven Development Framework for AI Agents - v3.0",
   "main": "index.js",
   "bin": {
-    "sdd-validate": "./bin/sdd-validate.js",
-    "sdd-template": "./bin/sdd-template.js",
-    "sdd-trace": "./bin/sdd-trace.js",
-    "sdd-init": "./bin/sdd-init.js"
+    "ai-spec-validate": "./bin/sdd-validate.js",
+    "ai-spec-template": "./bin/sdd-template.js",
+    "ai-spec-trace": "./bin/sdd-trace.js",
+    "ai-spec-init": "./bin/sdd-init.js"
   },
   "files": [
     "bin/",
     "templates/",
     "workflows/",
-    "SDD-Framework.md",
+    "ai-spec-kit.md",
     "README.md"
   ],
   "scripts": {
-    "test": "node bin/sdd-validate.js examples/user-login-v3/specs",
+    "test": "node bin/ai-spec-validate.js examples/user-login-v3/specs",
     "lint": "eslint bin/ templates/"
   },
   "keywords": [
@@ -28,7 +28,7 @@
     "requirements",
     "traceability"
   ],
-  "author": "SDD-F Team",
+  "author": "AI Spec Kit Team",
   "license": "MIT",
   "repository": {
     "type": "git",

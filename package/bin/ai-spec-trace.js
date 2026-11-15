@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * SDD-F v3.0 Traceability Generator CLI
- * Usage: sdd-trace <specs_dir> [options]
+ * AI Spec Kit v3.0 Traceability Generator CLI
+ * Usage: ai-spec-trace <specs_dir> [options]
  */
 
 const fs = require('fs');
@@ -68,7 +68,7 @@ function generateTraceability(specsDir) {
   const traceability = {
     generated: new Date().toISOString().split('T')[0],
     version: '1.0',
-    framework: 'SDD-F v3.0',
+    framework: 'AI Spec Kit v3.0',
     specs: specs.map(spec => ({
       id: spec.id,
       type: spec.type,
@@ -90,8 +90,8 @@ function main() {
   const outputFile = args[1];
 
   if (!specsDir) {
-    console.log('Usage: sdd-trace <specs_dir> [output_file]');
-    console.log('Example: sdd-trace specs/ traceability.yaml');
+    console.log('Usage: ai-spec-trace <specs_dir> [output_file]');
+    console.log('Example: ai-spec-trace specs/ traceability.yaml');
     process.exit(1);
   }
 

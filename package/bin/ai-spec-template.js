@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * SDD-F v3.0 Template Generator CLI
- * Usage: sdd-template <level> [options]
+ * AI Spec Kit v3.0 Template Generator CLI
+ * Usage: ai-spec-template <level> [options]
  */
 
 const fs = require('fs');
@@ -228,7 +228,7 @@ function main() {
   const outputFile = args[1];
 
   if (!level || !templates[level]) {
-    console.log('Usage: sdd-template <level> [output_file]');
+    console.log('Usage: ai-spec-template <level> [output_file]');
     console.log('Available templates:');
     Object.keys(templates).forEach(k => console.log(`  ${k}`));
     process.exit(1);

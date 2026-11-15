@@ -1,4 +1,4 @@
-name: SDD-F v3.0 Validation
+name: AI Spec Kit v3.0 Validation
 
 on:
   pull_request:
@@ -26,7 +26,7 @@ jobs:
         run: npm install -g @sdd/framework
 
       - name: Validate specs
-        run: sdd-validate specs/ --ci
+        run: ai-spec-validate specs/ --ci
         continue-on-error: false
 
       - name: Check traceability

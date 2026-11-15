@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * SDD-F v3.0 Spec Validator (Node.js version)
+ * AI Spec Kit v3.0 Spec Validator (Node.js version)
  * Simpler validation for quick checks
  */
 
@@ -213,7 +213,7 @@ class SDDValidator {
     const traceability = {
       generated: new Date().toISOString().split('T')[0],
       version: '1.0',
-      framework: 'SDD-F v3.0',
+      framework: 'AI Spec Kit v3.0',
       specs: this.specs.map(spec => ({
         id: spec.id,
         type: spec.type,
@@ -232,7 +232,7 @@ class SDDValidator {
 
   validate() {
     console.log('='.repeat(60));
-    console.log('SDD-F v3.0 Spec Validator (Node.js)');
+    console.log('AI Spec Kit v3.0 Spec Validator (Node.js)');
     console.log('='.repeat(60));
 
     const count = this.scanSpecs();
@@ -289,8 +289,8 @@ if (require.main === module) {
   const specsDir = process.argv[2];
   
   if (!specsDir) {
-    console.log('Usage: node sdd-validate.js <specs_dir>');
-    console.log('Example: node sdd-validate.js examples/user-login-v3/specs');
+    console.log('Usage: node ai-spec-validate.js <specs_dir>');
+    console.log('Example: node ai-spec-validate.js examples/user-login-v3/specs');
     process.exit(1);
   }
 

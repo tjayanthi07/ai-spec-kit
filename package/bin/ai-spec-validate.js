@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 /**
- * SDD-F v3.0 Validator CLI
- * Usage: sdd-validate <specs_dir> [options]
+ * AI Spec Kit v3.0 Validator CLI
+ * Usage: ai-spec-validate <specs_dir> [options]
  */
 
 const path = require('path');
 const fs = require('fs');
 
 // Import the enhanced validator
-const EnhancedSDDValidator = require('../tools/sdd-validate-enhanced.js');
+const EnhancedSDDValidator = require('../tools/ai-spec-validate-enhanced.js');
 
 function main() {
   const args = process.argv.slice(2);
@@ -21,13 +21,13 @@ function main() {
   };
 
   if (!specsDir) {
-    console.log('Usage: sdd-validate <specs_dir> [options]');
+    console.log('Usage: ai-spec-validate <specs_dir> [options]');
     console.log('Options:');
     console.log('  --ci              CI mode (exit 1 on failure)');
     console.log('  --no-coverage     Skip coverage report');
     console.log('  --no-context      Skip context pack validation');
     console.log('  --no-drift        Skip drift detection');
-    console.log('Example: sdd-validate specs/ --ci');
+    console.log('Example: ai-spec-validate specs/ --ci');
     process.exit(1);
   }
 

@@ -1,4 +1,4 @@
-# Spec-Driven Development Framework (SDD-F) v3.0
+# AI Spec Kit v3.0
 
 **Version:** 3.0 · **Status:** Draft for review · **Scope:** Any software application, greenfield or brownfield
 
@@ -15,7 +15,7 @@
 
 ## 1. Purpose
 
-SDD-F v3.0 defines a lightweight, AI-friendly process for taking an application from idea to delivered, verified software. It guarantees three properties:
+AI Spec Kit v3.0 defines a lightweight, AI-friendly process for taking an application from idea to delivered, verified software. It guarantees three properties:
 
 1. **Every delivered unit traces to an approved requirement or a documented bug.** Nothing enters production without a source.
 2. **Every design decision is explicit, inspectable and attributable** to a named level and a named decider.
@@ -539,7 +539,7 @@ CONST → ARCH → CAP → ADR → INT → DIST
 
 ### Enforcement
 
-- **CI check:** `sdd-validate` runs on every PR
+- **CI check:** `ai-spec-validate` runs on every PR
 - **Commit trailers:** Code commits must include `Spec-Ref: TSK-###` or `Bug-Ref: BUG-###`
 - **Path checks:** Code changes in `src/` must have corresponding spec changes in `specs/`
 - **Merge blocking:** PRs fail if traceability checks fail
@@ -654,8 +654,8 @@ These checks are logged but do not block merge:
 # AI Agent Instructions
 
 ## Framework Overview
-This project uses Spec-Driven Development (SDD-F v3.0).
-See `SDD-Framework.md` for complete documentation.
+This project uses AI Spec Kit v3.0.
+See `ai-spec-kit.md` for complete documentation.
 
 ## Context Packs
 - For task implementation: Load `specs/tasks/<TSK-ID>.md` + relevant L1/L2 sections
@@ -694,19 +694,19 @@ Deferred to Phase P4 (Ecosystem). Gherkin scenarios are authored now in structur
 
 ## 19. Tooling Specification
 
-### 19.1 Validator CLI (`sdd-validate`)
+### 19.1 Validator CLI (`ai-spec-validate`)
 
 **Purpose:** Validate spec files against framework rules
 
 **Commands:**
 ```bash
-sdd-validate AGENTS.md                        # Validate project config
-sdd-validate specs/requirements/              # Validate requirements
-sdd-validate specs/design/feature-specs/      # Validate design specs
-sdd-validate specs/tasks/                     # Validate task specs
-sdd-validate specs/verification/              # Validate verification specs
-sdd-validate specs/ --traceability            # Validate traceability chain
-sdd-validate specs/ --ci                      # CI mode (exit 1 on failure)
+ai-spec-validate AGENTS.md                        # Validate project config
+ai-spec-validate specs/requirements/              # Validate requirements
+ai-spec-validate specs/design/feature-specs/      # Validate design specs
+ai-spec-validate specs/tasks/                     # Validate task specs
+ai-spec-validate specs/verification/              # Validate verification specs
+ai-spec-validate specs/ --traceability            # Validate traceability chain
+ai-spec-validate specs/ --ci                      # CI mode (exit 1 on failure)
 ```
 
 **Deterministic validation rules:**
@@ -732,16 +732,16 @@ sdd-validate specs/ --ci                      # CI mode (exit 1 on failure)
 
 ---
 
-### 19.2 Traceability Generator (`sdd-trace`)
+### 19.2 Traceability Generator (`ai-spec-trace`)
 
 **Purpose:** Generate traceability.yaml and dependency graph
 
 **Commands:**
 ```bash
-sdd-trace specs/ > traceability.yaml            # Generate YAML
-sdd-trace specs/ --graph > traceability.dot     # Generate Graphviz
-sdd-trace specs/ --diff                         # Show changes since last run
-sdd-trace specs/ --orphans                      # Show orphan detection report
+ai-spec-trace specs/ > traceability.yaml            # Generate YAML
+ai-spec-trace specs/ --graph > traceability.dot     # Generate Graphviz
+ai-spec-trace specs/ --diff                         # Show changes since last run
+ai-spec-trace specs/ --orphans                      # Show orphan detection report
 ```
 
 **Output:**
@@ -752,17 +752,17 @@ sdd-trace specs/ --orphans                      # Show orphan detection report
 
 ---
 
-### 19.3 Template Generator (`sdd-template`)
+### 19.3 Template Generator (`ai-spec-template`)
 
 **Purpose:** Generate markdown templates for each level
 
 **Commands:**
 ```bash
-sdd-template L1-requirements > specs/requirements/requirements.md
-sdd-template L2-design --feature login > specs/design/feature-specs/login.md
-sdd-template L3-task TSK-001 > specs/tasks/task-001.md
-sdd-template L4-verification > specs/verification/test-plan.md
-sdd-template --list                             # List all available templates
+ai-spec-template L1-requirements > specs/requirements/requirements.md
+ai-spec-template L2-design --feature login > specs/design/feature-specs/login.md
+ai-spec-template L3-task TSK-001 > specs/tasks/task-001.md
+ai-spec-template L4-verification > specs/verification/test-plan.md
+ai-spec-template --list                             # List all available templates
 ```
 
 **Output:**
@@ -1403,7 +1403,7 @@ See `examples/user-login-v3/` for a complete reference implementation following 
 
 ## Appendix B: Template Files
 
-Templates are available via `sdd-template` CLI. See Section 19.3 for usage.
+Templates are available via `ai-spec-template` CLI. See Section 19.3 for usage.
 
 ## Appendix C: CI/CD Integration
 
@@ -1420,9 +1420,9 @@ jobs:
       - name: Install SDD tools
         run: npm install -g @sdd/cli
       - name: Validate specs
-        run: sdd-validate specs/ --ci
+        run: ai-spec-validate specs/ --ci
       - name: Check traceability
-        run: sdd-trace specs/ --orphans
+        run: ai-spec-trace specs/ --orphans
       - name: Verify commit trailers
         run: |
           # Check that code commits have Spec-Ref or Bug-Ref
@@ -1439,18 +1439,18 @@ The framework is distributed as an npm package `@sdd/framework`:
 @sdd/framework/
 ├── package.json
 ├── bin/
-│   ├── sdd-validate.js      # Spec validator CLI
-│   ├── sdd-template.js      # Template generator CLI
-│   ├── sdd-trace.js         # Traceability generator CLI
-│   └── sdd-init.js          # Project initializer CLI
+│   ├── ai-spec-validate.js      # Spec validator CLI
+│   ├── ai-spec-template.js      # Template generator CLI
+│   ├── ai-spec-trace.js         # Traceability generator CLI
+│   └── ai-spec-init.js          # Project initializer CLI
 ├── templates/
 │   ├── requirements.md      # L1 template
 │   ├── design.md            # L2 template
 │   ├── task.md              # L3 template
 │   └── verification.md      # L4 template
 ├── workflows/
-│   └── sdd-validate.yml     # GitHub Actions workflow
-├── SDD-Framework.md         # Framework documentation
+│   └── ai-spec-validate.yml     # GitHub Actions workflow
+├── ai-spec-kit.md         # Framework documentation (ai-spec-kit.md)
 └── README.md                # Package documentation
 ```
 
@@ -1470,26 +1470,26 @@ npm install --save-dev @sdd/framework
 
 **Initialize new project:**
 ```bash
-sdd-init my-project
+ai-spec-init my-project
 cd my-project
 ```
 
 **Generate specs:**
 ```bash
-sdd-template L1-requirements specs/requirements/requirements.md
-sdd-template L2-design specs/design/architecture.md
-sdd-template L3-task specs/tasks/task-001.md
-sdd-template L4-verification specs/verification/test-plan.md
+ai-spec-template L1-requirements specs/requirements/requirements.md
+ai-spec-template L2-design specs/design/architecture.md
+ai-spec-template L3-task specs/tasks/task-001.md
+ai-spec-template L4-verification specs/verification/test-plan.md
 ```
 
 **Validate specs:**
 ```bash
-sdd-validate specs/ --ci
+ai-spec-validate specs/ --ci
 ```
 
 **Generate traceability:**
 ```bash
-sdd-trace specs/ traceability.yaml
+ai-spec-trace specs/ traceability.yaml
 ```
 
 ### Configuration
@@ -1501,7 +1501,7 @@ Each project configures the framework via:
 # AI Agent Instructions
 
 ## Framework Version
-SDD-F v3.0
+AI Spec Kit v3.0
 
 ## Project-Specific Configuration
 - **Rigor Level:** Standard
@@ -1537,12 +1537,12 @@ SDD-F v3.0
 
 ### CI/CD Integration
 
-The package includes a GitHub Actions workflow template at `workflows/sdd-validate.yml`. To use:
+The package includes a GitHub Actions workflow template at `workflows/ai-spec-validate.yml`. To use:
 
 1. Copy the workflow to your project:
 ```bash
 mkdir -p .github/workflows
-cp node_modules/@sdd/framework/workflows/sdd-validate.yml .github/workflows/
+cp node_modules/@sdd/framework/workflows/ai-spec-validate.yml .github/workflows/
 ```
 
 2. The workflow automatically runs on PRs and pushes to main/develop branches.

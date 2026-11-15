@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * SDD-F v3.0 Project Initializer CLI
- * Usage: sdd-init <project_name> [options]
+ * AI Spec Kit v3.0 Project Initializer CLI
+ * Usage: ai-spec-init <project_name> [options]
  */
 
 const fs = require('fs');
@@ -32,7 +32,7 @@ function createAGENTS(projectPath, projectName) {
   const content = `# AI Agent Instructions
 
 ## Framework Version
-SDD-F v3.0
+AI Spec Kit v3.0
 
 ## Project: ${projectName}
 
@@ -97,20 +97,20 @@ function createConfig(projectPath) {
 
 function createGitHubWorkflow(projectPath) {
   const workflowPath = path.join(projectPath, '.github/workflows');
-  const workflowFile = path.join(workflowPath, 'sdd-validate.yml');
+  const workflowFile = path.join(workflowPath, 'ai-spec-validate.yml');
   
   // Copy workflow template
-  const templatePath = path.join(__dirname, '../workflows/sdd-validate.yml');
+  const templatePath = path.join(__dirname, '../workflows/ai-spec-validate.yml');
   if (fs.existsSync(templatePath)) {
     fs.copyFileSync(templatePath, workflowFile);
-    console.log('✅ Created .github/workflows/sdd-validate.yml');
+    console.log('✅ Created .github/workflows/ai-spec-validate.yml');
   }
 }
 
 function createREADME(projectPath, projectName) {
   const content = `# ${projectName}
 
-This project uses Spec-Driven Development (SDD-F v3.0).
+This project uses Spec-Driven Development (AI Spec Kit v3.0).
 
 ## Quick Start
 
@@ -121,21 +121,21 @@ This project uses Spec-Driven Development (SDD-F v3.0).
 
 2. **Initialize specs:**
    \`\`\`bash
-   sdd-init ${projectName}
+   ai-spec-init ${projectName}
    \`\`\`
 
 3. **Generate requirements:**
    \`\`\`bash
-   sdd-template L1-requirements specs/requirements/requirements.md
+   ai-spec-template L1-requirements specs/requirements/requirements.md
    \`\`\`
 
 4. **Validate specs:**
    \`\`\`bash
-   sdd-validate specs/ --ci
+   ai-spec-validate specs/ --ci
    \`\`\`
 
 ## Framework Documentation
-See \`SDD-Framework.md\` for complete documentation.
+See \`ai-spec-kit.md\` for complete documentation.
 
 ## Spec Structure
 - \`specs/requirements/\` - What/why we're building
@@ -154,12 +154,12 @@ function main() {
   const projectPath = args[1] || projectName;
 
   if (!projectName) {
-    console.log('Usage: sdd-init <project_name> [project_path]');
-    console.log('Example: sdd-init my-app ./my-app');
+    console.log('Usage: ai-spec-init <project_name> [project_path]');
+    console.log('Example: ai-spec-init my-app ./my-app');
     process.exit(1);
   }
 
-  console.log(`🚀 Initializing SDD-F v3.0 project: ${projectName}`);
+  console.log(`🚀 Initializing AI Spec Kit v3.0 project: ${projectName}`);
   console.log(`📁 Project path: ${projectPath}`);
 
   // Create directory structure
@@ -175,8 +175,8 @@ function main() {
   console.log('\nNext steps:');
   console.log('1. Edit AGENTS.md with project-specific settings');
   console.log('2. Edit .sdd/config.json with team configuration');
-  console.log('3. Run: sdd-template L1-requirements specs/requirements/requirements.md');
-  console.log('4. Run: sdd-validate specs/ --ci');
+  console.log('3. Run: ai-spec-template L1-requirements specs/requirements/requirements.md');
+  console.log('4. Run: ai-spec-validate specs/ --ci');
 }
 
 main();

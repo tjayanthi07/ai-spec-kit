@@ -1,8 +1,8 @@
 # AI Agent Instructions
 
 ## Framework Overview
-This project uses Spec-Driven Development (SDD-F v3.0).
-See `SDD-Framework.md` for complete documentation.
+This project uses AI Spec Kit v3.0.
+See `ai-spec-kit.md` for complete documentation.
 
 ## Context Packs
 - For task implementation: Load `specs/tasks/<TSK-ID>.md` + relevant L1/L2 sections

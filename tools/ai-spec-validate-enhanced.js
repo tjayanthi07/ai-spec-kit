@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * SDD-F v3.0 Enhanced Spec Validator
+ * AI Spec Kit v3.0 Enhanced Spec Validator
  * Includes: coverage reporting, context pack validation, spec drift detection
  */
 
@@ -311,7 +311,7 @@ class EnhancedSDDValidator {
     const trace = {
       generated: new Date().toISOString().split('T')[0],
       version: '1.0',
-      framework: 'SDD-F v3.0',
+      framework: 'AI Spec Kit v3.0',
       specs: this.specs.map(s => ({
         id: s.id, type: s.type, level: s.level,
         parent: s.parent.length ? s.parent : null,
@@ -327,7 +327,7 @@ class EnhancedSDDValidator {
   // === MAIN VALIDATION ===
   validate() {
     console.log('='.repeat(60));
-    console.log('SDD-F v3.0 Enhanced Spec Validator');
+    console.log('AI Spec Kit v3.0 Enhanced Spec Validator');
     console.log('='.repeat(60));
 
     const count = this.scanSpecs();
@@ -444,13 +444,13 @@ if (require.main === module) {
   };
 
   if (!specsDir) {
-    console.log('Usage: node sdd-validate-enhanced.js <specs_dir> [options]');
+    console.log('Usage: node ai-spec-validate-enhanced.js <specs_dir> [options]');
     console.log('Options:');
     console.log('  --ci              CI mode (exit 1 on failure)');
     console.log('  --no-coverage     Skip coverage report');
     console.log('  --no-context      Skip context pack validation');
     console.log('  --no-drift        Skip drift detection');
-    console.log('Example: node sdd-validate-enhanced.js specs/ --ci');
+    console.log('Example: node ai-spec-validate-enhanced.js specs/ --ci');
     process.exit(1);
   }
 

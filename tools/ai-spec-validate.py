@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SDD-F v3.0 Spec Validator
+AI Spec Kit v3.0 Spec Validator
 Validates spec files against framework rules.
 """
 
@@ -38,7 +38,7 @@ class SpecFile:
     version: str = ""
 
 class SDDValidator:
-    def __init__(self, specs_dir: str, framework_file: str = "SDD-Framework.md"):
+    def __init__(self, specs_dir: str, framework_file: str = "ai-spec-kit.md"):
         self.specs_dir = Path(specs_dir)
         self.framework_file = Path(framework_file)
         self.results: List[ValidationResult] = []
@@ -284,7 +284,7 @@ class SDDValidator:
         traceability = {
             'generated': '2025-01-15',
             'version': '1.0',
-            'framework': 'SDD-F v3.0',
+            'framework': 'AI Spec Kit v3.0',
             'specs': []
         }
         
@@ -305,7 +305,7 @@ class SDDValidator:
     def validate_all(self) -> bool:
         """Run all validations"""
         print("=" * 60)
-        print("SDD-F v3.0 Spec Validator")
+        print("AI Spec Kit v3.0 Spec Validator")
         print("=" * 60)
         
         # Load framework
@@ -377,12 +377,12 @@ class SDDValidator:
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python sdd-validate.py <specs_dir> [framework_file]")
-        print("Example: python sdd-validate.py examples/user-login-v3/specs SDD-Framework.md")
+        print("Usage: python ai-spec-validate.py <specs_dir> [framework_file]")
+        print("Example: python ai-spec-validate.py examples/user-login-v3/specs ai-spec-kit.md")
         sys.exit(1)
     
     specs_dir = sys.argv[1]
-    framework_file = sys.argv[2] if len(sys.argv) > 2 else "SDD-Framework.md"
+    framework_file = sys.argv[2] if len(sys.argv) > 2 else "ai-spec-kit.md"
     
     validator = SDDValidator(specs_dir, framework_file)
     success = validator.validate_all()
