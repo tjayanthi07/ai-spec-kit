@@ -46,23 +46,25 @@
 
 ### Scenario 1: Successful Login
 ```gherkin
-Given a registered user exists
-When the user navigates to /login
-And enters valid email and password
-And clicks "Login"
-Then the user is redirected to /dashboard
-And the dashboard displays user name
-And the user can access protected features
+Scenario: Successful login end-to-end
+  Given a registered user exists
+  When the user navigates to /login
+  And enters valid email and password
+  And clicks "Login"
+  Then the user is redirected to /dashboard
+  And the dashboard displays user name
+  And the user can access protected features
 ```
 
 ### Scenario 2: Invalid Login
 ```gherkin
-Given a registered user exists
-When the user navigates to /login
-And enters valid email but wrong password
-And clicks "Login"
-Then the user sees error message "Invalid email or password"
-And the user remains on /login page
+Scenario: Invalid login shows error
+  Given a registered user exists
+  When the user navigates to /login
+  And enters valid email but wrong password
+  And clicks "Login"
+  Then the user sees error message "Invalid email or password"
+  And the user remains on /login page
 ```
 
 ## Spec
