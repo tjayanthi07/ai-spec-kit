@@ -6,6 +6,9 @@ on:
   push:
     branches: [main, develop]
 
+env:
+  SPECS_DIR: specs
+
 jobs:
   validate-specs:
     runs-on: ubuntu-latest
@@ -23,32 +26,34 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install -g @sdd/framework
+        run: npm ci
 
       - name: Validate specs
-        run: ai-spec-validate specs/ --ci
+        run: npx ai-spec-validate "$SPECS_DIR" --ci
         continue-on-error: false
 
       - name: Check traceability
         run: |
           node -e "
             const fs = require('fs');
-            const trace = JSON.parse(fs.readFileSync('specs/traceability.yaml', 'utf8'));
-            const orphans = trace.specs.filter(s => 
+            const trace = JSON.parse(fs.readFileSync('$SPECS_DIR/traceability.yaml', 'utf8'));
+            const specs = trace.specs || trace;
+            const orphans = specs.filter(s => 
               ['Task', 'Test', 'Implementation'].includes(s.type) && 
               (!s.parent || s.parent.length === 0)
             );
             if (orphans.length > 0) {
-              console.error('❌ Orphan deliverables found:', orphans.map(o => o.id));
+              console.error('Orphan deliverables found:', orphans.map(o => o.id));
               process.exit(1);
             }
-            console.log('✅ No orphan deliverables');
+            console.log('No orphan deliverables');
           "
 
       - name: Upload validation report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: sdd-validation-report
-          path: specs/traceability.yaml
+          name: ai-spec-validation-report
+          path: ${{ env.SPECS_DIR }}/traceability.yaml
           retention-days: 30
+          if-no-files-found: warn

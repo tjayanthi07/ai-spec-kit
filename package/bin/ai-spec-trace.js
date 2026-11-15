@@ -89,7 +89,7 @@ function main() {
   const specsDir = args[0];
   const outputFile = args[1];
 
-  if (!specsDir) {
+  if (!specsDir || specsDir === '--help' || specsDir === '-h') {
     console.log('Usage: ai-spec-trace <specs_dir> [output_file]');
     console.log('Example: ai-spec-trace specs/ traceability.yaml');
     process.exit(1);

@@ -8,7 +8,7 @@ const path = require('path');
 const fs = require('fs');
 
 // Import the enhanced validator
-const EnhancedSDDValidator = require('../tools/ai-spec-validate-enhanced.js');
+const EnhancedSDDValidator = require('../lib/ai-spec-validate-enhanced.js');
 
 function main() {
   const args = process.argv.slice(2);
@@ -20,7 +20,7 @@ function main() {
     ci: args.includes('--ci')
   };
 
-  if (!specsDir) {
+  if (!specsDir || specsDir === '--help' || specsDir === '-h') {
     console.log('Usage: ai-spec-validate <specs_dir> [options]');
     console.log('Options:');
     console.log('  --ci              CI mode (exit 1 on failure)');
