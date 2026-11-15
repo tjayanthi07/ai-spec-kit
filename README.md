@@ -175,6 +175,15 @@ jobs:
 - **Regulated industries** - Full traceability and audit trails
 - **Brownfield projects** - Path-scoped coverage for legacy code
 
+## 📝 TODO
+
+- [ ] Publish package to npm:
+  ```bash
+  cd package
+  npm login
+  npm publish --access public
+  ```
+
 ## 🤝 Contributing
 
 1. Fork the repository
