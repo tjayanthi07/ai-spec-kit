@@ -372,6 +372,16 @@ class EnhancedSDDValidator {
     console.log(`\n${passed ? '✅ VALIDATION PASSED' : '❌ VALIDATION FAILED'}`);
     if (this.warnings.length > 0) console.log(`⚠️  ${this.warnings.length} warnings found`);
 
+    if (this.errors.length > 0) {
+      console.log('\n' + '='.repeat(60));
+      console.log('ERROR DETAILS');
+      console.log('='.repeat(60));
+      this.errors.forEach(e => {
+        console.log(`❌ ${e.message}`);
+        if (e.file) console.log(`   File: ${e.file}`);
+      });
+    }
+
     // CI mode: exit with error code
     if (this.options.ci && !passed) process.exit(1);
 
