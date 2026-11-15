@@ -1,0 +1,309 @@
+{
+  "generated": "2026-11-15",
+  "version": "1.0",
+  "framework": "SDD-F v3.0",
+  "specs": [
+    {
+      "id": "ARCH-001",
+      "type": "Architecture",
+      "level": "L2",
+      "parent": [
+        "REQ-001"
+      ],
+      "children": [
+        "FR-001",
+        "FR-002",
+        "FR-003",
+        "FR-004",
+        "FR-005",
+        "FR-006"
+      ],
+      "status": "Approved (via PR review)",
+      "version": "1.0",
+      "path": "examples\\user-login-v3\\specs\\design\\architecture.md"
+    },
+    {
+      "id": "DATA-001",
+      "type": "Data Model",
+      "level": "L2",
+      "parent": [
+        "REQ-001",
+        "ARCH-001"
+      ],
+      "children": [],
+      "status": "Approved (via PR review)",
+      "version": "1.0",
+      "path": "examples\\user-login-v3\\specs\\design\\data-model.md"
+    },
+    {
+      "id": "FR-001",
+      "type": "Feature Specification",
+      "level": "L2",
+      "parent": [
+        "REQ-001",
+        "ARCH-001"
+      ],
+      "children": [
+        "SCN-001",
+        "SCN-002",
+        "SCN-003",
+        "SCN-004",
+        "TSK-001",
+        "TSK-002",
+        "TST-001",
+        "TST-002"
+      ],
+      "status": "Approved (via PR review)",
+      "version": "1.0",
+      "path": "examples\\user-login-v3\\specs\\design\\feature-specs\\login.md"
+    },
+    {
+      "id": "SEC-001",
+      "type": "Security",
+      "level": "L2",
+      "parent": [
+        "REQ-001",
+        "ARCH-001"
+      ],
+      "children": [],
+      "status": "Approved (via PR review)",
+      "version": "1.0",
+      "path": "examples\\user-login-v3\\specs\\design\\security.md"
+    },
+    {
+      "id": "INT-001",
+      "type": "Integration Spec",
+      "level": "L5",
+      "parent": [
+        "REQ-001",
+        "FR-001",
+        "FR-002",
+        "FR-003",
+        "FR-004",
+        "FR-005",
+        "FR-006"
+      ],
+      "children": [
+        "TST-002",
+        "TST-003"
+      ],
+      "status": "Approved (via PR review)",
+      "version": "1.0",
+      "path": "examples\\user-login-v3\\specs\\integration\\integration-spec.md"
+    },
+    {
+      "id": "DIST-001",
+      "type": "Release & Learning",
+      "level": "L6",
+      "parent": [
+        "REL-001"
+      ],
+      "children": [],
+      "status": "Approved (via PR review)",
+      "version": "1.0",
+      "path": "examples\\user-login-v3\\specs\\release\\2025-01-15-v1.0.md"
+    },
+    {
+      "id": "REL-001",
+      "type": "Release Record",
+      "level": "L6",
+      "parent": [
+        "REQ-001",
+        "FR-001",
+        "FR-002",
+        "FR-003",
+        "FR-004",
+        "FR-005",
+        "FR-006"
+      ],
+      "children": [],
+      "status": "Approved (via PR review)",
+      "version": "1.0",
+      "path": "examples\\user-login-v3\\specs\\release\\release-2025-01-15.md"
+    },
+    {
+      "id": "ACT-001",
+      "type": "Actors",
+      "level": "L1",
+      "parent": [
+        "REQ-001"
+      ],
+      "children": [],
+      "status": "Approved (via PR review)",
+      "version": "1.0",
+      "path": "examples\\user-login-v3\\specs\\requirements\\actors.md"
+    },
+    {
+      "id": "OQ-001",
+      "type": "Open Questions",
+      "level": "L1",
+      "parent": [
+        "REQ-001"
+      ],
+      "children": [],
+      "status": "Approved (via PR review)",
+      "version": "1.0",
+      "path": "examples\\user-login-v3\\specs\\requirements\\open-questions.md"
+    },
+    {
+      "id": "REQ-001",
+      "type": "Requirements",
+      "level": "L1",
+      "parent": null,
+      "children": [
+        "FR-001",
+        "FR-002",
+        "FR-003",
+        "FR-004",
+        "FR-005",
+        "FR-006",
+        "SCN-001",
+        "SCN-002",
+        "SCN-003",
+        "SCN-004"
+      ],
+      "status": "Approved (via PR review)",
+      "version": "1.0",
+      "path": "examples\\user-login-v3\\specs\\requirements\\requirements.md"
+    },
+    {
+      "id": "BR-001",
+      "type": "Business Rules",
+      "level": "L1",
+      "parent": [
+        "REQ-001"
+      ],
+      "children": [
+        "FR-001",
+        "FR-002",
+        "FR-003",
+        "FR-005",
+        "FR-006"
+      ],
+      "status": "Approved (via PR review)",
+      "version": "1.0",
+      "path": "examples\\user-login-v3\\specs\\requirements\\rules.md"
+    },
+    {
+      "id": "SCN-001",
+      "type": "Scenarios",
+      "level": "L1",
+      "parent": [
+        "REQ-001"
+      ],
+      "children": [
+        "TST-001",
+        "TST-002",
+        "TST-003"
+      ],
+      "status": "Approved (via PR review)",
+      "version": "1.0",
+      "path": "examples\\user-login-v3\\specs\\requirements\\scenarios.md"
+    },
+    {
+      "id": "BACKLOG-001",
+      "type": "Task Backlog",
+      "level": "L3",
+      "parent": [
+        "REQ-001",
+        "FR-001"
+      ],
+      "children": [
+        "TSK-001",
+        "TSK-002",
+        "TSK-003",
+        "TSK-004"
+      ],
+      "status": "Approved (via PR review)",
+      "version": "1.0",
+      "path": "examples\\user-login-v3\\specs\\tasks\\backlog.md"
+    },
+    {
+      "id": "TSK-001",
+      "type": "Task Specification",
+      "level": "L3",
+      "parent": [
+        "FR-001",
+        "SCN-001",
+        "SCN-002"
+      ],
+      "children": [
+        "TST-001",
+        "IMPL-001"
+      ],
+      "status": "Approved (via PR review)",
+      "version": "1.0",
+      "path": "examples\\user-login-v3\\specs\\tasks\\task-001.md"
+    },
+    {
+      "id": "TSK-002",
+      "type": "Task Specification",
+      "level": "L3",
+      "parent": [
+        "FR-002",
+        "FR-003",
+        "SCN-001",
+        "SCN-002"
+      ],
+      "children": [
+        "TST-002",
+        "IMPL-002"
+      ],
+      "status": "Approved (via PR review)",
+      "version": "1.0",
+      "path": "examples\\user-login-v3\\specs\\tasks\\task-002.md"
+    },
+    {
+      "id": "TSK-003",
+      "type": "Task Specification",
+      "level": "L3",
+      "parent": [
+        "FR-005",
+        "SCN-003"
+      ],
+      "children": [
+        "TST-003"
+      ],
+      "status": "Approved (via PR review)",
+      "version": "1.0",
+      "path": "examples\\user-login-v3\\specs\\tasks\\task-003.md"
+    },
+    {
+      "id": "TSK-004",
+      "type": "Task Specification",
+      "level": "L3",
+      "parent": [
+        "FR-006",
+        "SCN-004"
+      ],
+      "children": [
+        "TST-003"
+      ],
+      "status": "Approved (via PR review)",
+      "version": "1.0",
+      "path": "examples\\user-login-v3\\specs\\tasks\\task-004.md"
+    },
+    {
+      "id": "TP-001",
+      "type": "Test Plan",
+      "level": "L4",
+      "parent": [
+        "REQ-001",
+        "FR-001",
+        "FR-002",
+        "FR-003",
+        "FR-004",
+        "FR-005",
+        "FR-006"
+      ],
+      "children": [
+        "TST-001",
+        "TST-002",
+        "TST-003"
+      ],
+      "status": "Approved (via PR review)",
+      "version": "1.0",
+      "path": "examples\\user-login-v3\\specs\\verification\\test-plan.md"
+    }
+  ]
+}

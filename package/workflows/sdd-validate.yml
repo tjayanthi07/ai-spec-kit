@@ -1,0 +1,54 @@
+name: SDD-F v3.0 Validation
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+jobs:
+  validate-specs:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install -g @sdd/framework
+
+      - name: Validate specs
+        run: sdd-validate specs/ --ci
+        continue-on-error: false
+
+      - name: Check traceability
+        run: |
+          node -e "
+            const fs = require('fs');
+            const trace = JSON.parse(fs.readFileSync('specs/traceability.yaml', 'utf8'));
+            const orphans = trace.specs.filter(s => 
+              ['Task', 'Test', 'Implementation'].includes(s.type) && 
+              (!s.parent || s.parent.length === 0)
+            );
+            if (orphans.length > 0) {
+              console.error('❌ Orphan deliverables found:', orphans.map(o => o.id));
+              process.exit(1);
+            }
+            console.log('✅ No orphan deliverables');
+          "
+
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdd-validation-report
+          path: specs/traceability.yaml
+          retention-days: 30

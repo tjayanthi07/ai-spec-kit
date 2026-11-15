@@ -1,0 +1,233 @@
+# Traceability Matrix
+# Generated: 2025-01-15
+# Version: 1.0
+# Framework: SDD-F v3.0
+
+traceability:
+  - id: REQ-001
+    type: requirements
+    title: User Login Requirements
+    level: L1
+    parent: null
+    children:
+      - FR-001
+      - FR-002
+      - FR-003
+      - FR-004
+      - FR-005
+      - FR-006
+      - SCN-001
+      - SCN-002
+      - SCN-003
+      - SCN-004
+    status: approved
+    commit_sha: abc123
+
+  - id: FR-001
+    type: functional_requirement
+    title: Email and Password Input
+    level: L1
+    parent: REQ-001
+    children:
+      - SCN-001
+      - TST-001
+      - TSK-001
+    status: approved
+    commit_sha: def456
+
+  - id: FR-002
+    type: functional_requirement
+    title: Credential Validation
+    level: L1
+    parent: REQ-001
+    children:
+      - SCN-002
+      - TST-002
+      - TSK-002
+    status: approved
+    commit_sha: ghi789
+
+  - id: FR-003
+    type: functional_requirement
+    title: Session Creation
+    level: L1
+    parent: REQ-001
+    children:
+      - SCN-001
+      - TST-002
+      - TSK-002
+    status: approved
+    commit_sha: jkl012
+
+  - id: FR-004
+    type: functional_requirement
+    title: Error Handling
+    level: L1
+    parent: REQ-001
+    children:
+      - SCN-002
+      - TST-002
+      - TSK-001
+    status: approved
+    commit_sha: mno345
+
+  - id: FR-005
+    type: functional_requirement
+    title: Rate Limiting
+    level: L1
+    parent: REQ-001
+    children:
+      - SCN-003
+      - TST-003
+      - TSK-003
+    status: approved
+    commit_sha: pqr678
+
+  - id: FR-006
+    type: functional_requirement
+    title: Password Reset
+    level: L1
+    parent: REQ-001
+    children:
+      - SCN-004
+      - TST-003
+      - TSK-004
+    status: approved
+    commit_sha: stu901
+
+  - id: SCN-001
+    type: scenario
+    title: Successful Login
+    level: L1
+    parent: REQ-001
+    children:
+      - TST-001
+    status: approved
+    commit_sha: vwx234
+
+  - id: SCN-002
+    type: scenario
+    title: Invalid Password
+    level: L1
+    parent: REQ-001
+    children:
+      - TST-002
+    status: approved
+    commit_sha: yz567
+
+  - id: SCN-003
+    type: scenario
+    title: Rate Limiting
+    level: L1
+    parent: REQ-001
+    children:
+      - TST-003
+    status: approved
+    commit_sha: abc890
+
+  - id: SCN-004
+    type: scenario
+    title: Password Reset
+    level: L1
+    parent: REQ-001
+    children:
+      - TST-003
+    status: approved
+    commit_sha: def123
+
+  - id: ARCH-001
+    type: architecture
+    title: Architecture
+    level: L2
+    parent: REQ-001
+    children:
+      - FR-001
+      - FR-002
+      - FR-003
+      - FR-004
+      - FR-005
+      - FR-006
+    status: approved
+    commit_sha: ghi456
+
+  - id: TSK-001
+    type: task
+    title: Create Login Form Component
+    level: L3
+    parent: FR-001
+    children:
+      - TST-001
+      - IMPL-001
+    status: approved
+    commit_sha: jkl789
+
+  - id: TSK-002
+    type: task
+    title: Implement Login API Endpoint
+    level: L3
+    parent: FR-002
+    children:
+      - TST-002
+      - IMPL-002
+    status: approved
+    commit_sha: mno012
+
+  - id: TSK-003
+    type: task
+    title: Implement Rate Limiting
+    level: L3
+    parent: FR-005
+    children:
+      - TST-003
+    status: approved
+    commit_sha: pqr345
+
+  - id: TSK-004
+    type: task
+    title: Implement Password Reset
+    level: L3
+    parent: FR-006
+    children:
+      - TST-003
+    status: approved
+    commit_sha: stu678
+
+  - id: TST-001
+    type: test
+    title: LoginForm Component Tests
+    level: L4
+    parent: TSK-001
+    children: []
+    status: approved
+    commit_sha: vwx901
+
+  - id: TST-002
+    type: test
+    title: Auth Service and API Tests
+    level: L4
+    parent: TSK-002
+    children: []
+    status: approved
+    commit_sha: yz234
+
+  - id: TST-003
+    type: test
+    title: Rate Limiting and Password Reset Tests
+    level: L4
+    parent: TSK-003
+    children: []
+    status: approved
+    commit_sha: abc567
+
+# Orphan Detection
+orphans: []
+
+# Validation Rules Applied
+- All IDs follow format: [A-Z]+-[0-9]+
+- All parent-child relationships are bidirectional
+- No orphan requirements (all have parents)
+- No orphan deliverables (all have requirements)
+- All FRs have at least one test
+- All tests trace to requirements
+- Core chain: REQ → FR/NFR → SCN → TSK → TST → IMPL → REL
+- All approvals bound to commit SHA

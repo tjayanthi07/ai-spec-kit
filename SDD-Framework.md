@@ -1,6 +1,6 @@
-# Spec-Driven Development Framework (SDD-F) v2.0
+# Spec-Driven Development Framework (SDD-F) v3.0
 
-**Version:** 2.0 · **Status:** Draft for review · **Scope:** Any software application, greenfield or brownfield
+**Version:** 3.0 · **Status:** Draft for review · **Scope:** Any software application, greenfield or brownfield
 
 **Normative language:** This document uses RFC 2119 keywords:
 - **MUST** - Absolute requirement
@@ -9,15 +9,24 @@
 - **SHOULD NOT** - Not recommended, but may be acceptable with justification
 - **MAY** - Optional
 
+**Core philosophy:** Spec-driven, not spec-heavy. 4 core levels for 80% of work, 3 extended levels for complex features.
+
 ---
 
 ## 1. Purpose
 
-SDD-F defines a repeatable, tool-agnostic process for taking an application from idea to delivered, verified software. It guarantees three properties:
+SDD-F v3.0 defines a lightweight, AI-friendly process for taking an application from idea to delivered, verified software. It guarantees three properties:
 
 1. **Every delivered unit traces to an approved requirement or a documented bug.** Nothing enters production without a source.
 2. **Every design decision is explicit, inspectable and attributable** to a named level and a named decider.
 3. **Feedback is structural** — discoveries at any level reopen the level above through a defined change path.
+
+**v3.0 changes from v2.1:**
+- Reduced from 12 levels to 4 core + 3 extended
+- Reduced from 12 gates to 4 core + 3 extended
+- Added context packs for AI agent efficiency
+- Simplified templates and validation
+- Maintained all critical safeguards (approvals, traceability, evidence)
 
 ---
 
@@ -26,20 +35,20 @@ SDD-F defines a repeatable, tool-agnostic process for taking an application from
 | Term | Definition |
 |---|---|
 | **Spec** | An explicit, reviewable statement of intended behaviour, structure or constraint, precise enough for another person or an AI agent to implement against without guessing. |
-| **Level** | A zoom depth in the specification hierarchy (L0–L11). Each level answers a different question. |
-| **Phase** | A macro stage of the lifecycle (P0–P5). Each phase contains several levels. |
+| **Level** | A zoom depth in the specification hierarchy. Core levels (L1-L4) for most work, extended levels (L0, L5-L7) for complex features. |
 | **Gate** | A human approval point enforced by version control, not by file headers. |
 | **Trace link** | A declared reference from a child artifact to its parent requirement/decision. |
 | **Evidence** | A verifiable artifact proving a requirement was met, stored in `specs/evidence/` with CI-verified provenance. |
-| **Constitution** | The project-level rulebook every spec inherits. |
+| **Constitution** | The project-level rulebook every spec inherits (optional for small projects). |
 | **Rigor Level** | The depth of specification required for a feature, determined by risk not duration. |
+| **Context Pack** | A minimal set of specs an agent should load for a specific task type. |
 | **Override Decision** | A documented exception to normal feedback rules, requiring stakeholder approval. |
 
 ---
 
 ## 3. Guiding Principles
 
-1. **Requirement ≠ solution ≠ spec.** Requirements state what/why; design chooses how; specs communicate the chosen design. Collapsing them lets the implementer (human or AI) make business decisions silently.
+1. **Requirement ≠ solution ≠ spec.** Requirements state what/why; design chooses how; specs communicate the chosen design.
 
 2. **Fractal cycle.** Every level runs the same micro-cycle: *elicit → draft → challenge → decide → spec → verify → learn*.
 
@@ -51,7 +60,7 @@ SDD-F defines a repeatable, tool-agnostic process for taking an application from
 
 6. **Executable later.** Specs are structured prose/structured data now; the Gherkin→test harness is a later build phase.
 
-7. **Tool portability.** Canonical artifacts are plain Markdown + YAML/JSON in git; emitters produce Spec Kit / Kiro / OpenSpec-compatible views.
+7. **Tool portability.** Canonical artifacts are plain Markdown + YAML/JSON in git; single `AGENTS.md` entry point for all AI tools.
 
 8. **Deterministic validation.** Blocking checks MUST be deterministic. Non-deterministic checks (LLM-based) are advisory only.
 
@@ -59,17 +68,27 @@ SDD-F defines a repeatable, tool-agnostic process for taking an application from
 
 10. **Test integrity.** Tests derive from approved scenarios. Test file changes require explicit review.
 
+11. **Context efficiency.** Agents MUST use context packs to load only relevant specs, preventing context window overflow.
+
 ---
 
 ## 4. Lifecycle Overview
 
+### Core Levels (Required for Most Work)
+
 ```
-PHASE P0  CONSTITUTION
-PHASE P1  DISCOVER / REQUIREMENTS      L1 Business Case · L2 Business Spec
-PHASE P2  DESIGN                       L3 Capability · L4 Feature · L5 Tech Spec
-PHASE P3  DELIVER                      L6 Work Breakdown · L7 Task · L8 Test Plan · L9 Impl Spec
-PHASE P4  INTEGRATE & RELEASE          L10 Integration Spec
-PHASE P5  DISTILL                      L11 Release & Learning
+LEVEL 1  REQUIREMENTS          What/why we're building this
+LEVEL 2  DESIGN                How we'll build it
+LEVEL 3  TASKS                 What to build (broken into tasks)
+LEVEL 4  VERIFICATION          How we'll prove it works
+```
+
+### Extended Levels (Optional for Complex Features)
+
+```
+LEVEL 0  CONSTITUTION          Project rules (optional)
+LEVEL 5  INTEGRATION           Cross-feature concerns (optional)
+LEVEL 6  RELEASE               Deployment + learning (optional)
 ```
 
 **Micro-cycle (applies at every level):**
@@ -84,10 +103,10 @@ elicit → draft → challenge → decide → approve(gate) → implement/verify
 
 | Trigger | Action |
 |---|---|
-| Impl-spec reveals spec ambiguity/gap | Reopen the producing level; update spec first, then code |
-| Requirement proven infeasible | Reopen L1/L2 — never patch around it at task level |
-| Distill shows product not used as intended | Reopen L1 |
-| Backward movement dominates at any level | Stop; create override decision with stakeholder sign-off |
+| Implementation reveals spec gap | Reopen producing level; update spec first, then code |
+| Requirement proven infeasible | Reopen L1 — never patch around it at task level |
+| Verification shows spec was wrong | Reopen L1/L2 — fix requirement/design first |
+| Backward movement dominates | Stop; create override decision with stakeholder sign-off |
 
 **Feedback depth:** No artificial caps. If feedback requires reopening multiple levels, create an override decision documenting:
 - Why the spec gap exists
@@ -97,87 +116,70 @@ elicit → draft → challenge → decide → approve(gate) → implement/verify
 
 ---
 
-## 5. Phase P0 — Constitution (`constitution.md`)
+## 5. Level 0 — Constitution (Optional)
 
 **Question answered:** *What rules does every spec in this project inherit?*
 
-| Field | Content |
-|---|---|
-| Owner | Project owner |
-| Created | Once per project; amended by explicit decision record |
-| Contains | Stack & versions, repo layout, coding conventions, testing standards, security baseline, NFR defaults, ID conventions, gate policy, rigor level, tool emitter choices, evidence storage policy |
-| Gate G0 | Human approval via PR review; versioned (`v1`, `v2`…) |
-| Machine check | Required sections present; referenced by every spec's header |
-
-**Approval mechanism:**
-- Constitution changes require PR review by Project Owner
-- Approval is bound to commit SHA, not version number
-- CI check validates constitution structure on every PR
-
----
-
-## 6. Phase P1 — Discover / Requirements
-
-### L1 Business Case — `specs/00-business-case.md`
-
-**Question:** *Should we build this, and how will we know it worked?*
+**When to use:** Projects with > 3 contributors, regulated industries, or complex tech stacks.
 
 **Required fields:**
-- Problem statement
-- Target users
-- Value proposition
-- Success metrics (measurable, with targets)
-- **Non-goals** (explicit exclusions)
-- Alternatives considered
-- Risks
-- Go/no-go decision
-- Owner
+- Stack & versions
+- Repo layout
+- Coding conventions
+- Testing standards
+- Security baseline
+- NFR defaults
+- ID conventions
+- Gate policy
+- Rigor level
+- Context pack guidelines
+- Evidence storage policy
 
-**Author:** Stakeholder (human). Agent interviews and drafts.
+**Gate G0:** Human approval via PR review; versioned (`v1`, `v2`…).
 
-**Gate G1:** Human approval via PR review. No design work before this.
+**Machine check:** Required sections present; referenced by every spec's header.
 
-**Outputs:** `BC-###` decision IDs.
-
-**Approval mechanism:**
-- PR review by Product Owner
-- Approval binds to commit SHA
-- CI check validates required sections present
+**For small projects:** Skip this level. Use sensible defaults documented in `AGENTS.md`.
 
 ---
 
-### L2 Business Spec — `specs/01-business-spec/`
+## 6. Level 1 — Requirements
 
-**Question:** *What does the business need, independent of technology?*
+**Question:** *What does the business need, and how will we know it worked?*
 
-| File | Content | ID prefix |
-|---|---|---|
-| `actors.md` | Actors, goals, permissions | ACT |
-| `journeys.md` | As-is / to-be journeys, step flows | JRN |
-| `rules.md` | Business rules, invariants, constraints | BR |
-| `glossary.md` | Domain terms | — |
-| `acceptance.md` | Business-level Given/When/Then scenarios | BSC |
-| `open-questions.md` | Unresolved items blocking design | — |
+**Location:** `specs/requirements/`
 
-**Author:** Stakeholder + analyst (human-led; agent structures).
+**Files:**
+- `business-case.md` - Why we're building this (optional for small features)
+- `requirements.md` - What the system must do (FRs, NFRs)
+- `scenarios.md` - Acceptance criteria (Gherkin)
+- `actors.md` - Who uses the system (optional)
+- `rules.md` - Business rules (optional)
+- `open-questions.md` - Unresolved items
 
-**Capture method:** Problem interview → jobs-to-be-done → context-free/focusing questions → example-driven elicitation → document analysis → (optional) prototype/fake-door evidence.
+**Required for all features:**
+- `requirements.md` with FRs in EARS format
+- `scenarios.md` with Gherkin scenarios
+- `open-questions.md` (can be empty)
 
-**Formats:**
-- Rules: EARS-style statements (see Section 7 for EARS patterns)
-- Scenarios: Gherkin (see Section 8 for Gherkin profile)
+**Optional for small features:**
+- `business-case.md` (skip for bug fixes, internal tools)
+- `actors.md` (skip if single user type)
+- `rules.md` (skip if no complex business logic)
 
-**Gate G2:** Human approval of every BR/JRN/BSC via PR review.
+**Author:** Stakeholder + agent (human-led; agent structures).
 
-**Machine check (deterministic):**
-- Every journey has ≥1 rule or scenario
-- Every ID unique across project
-- Glossary covers all domain terms used (manual review)
-- Required sections present in each file
+**Gate G1:** Human approval via PR review.
 
-**Machine check (advisory):**
-- Contradiction detection across rules (LLM-assisted, logged)
-- Ambiguity flags (keyword detection, logged)
+**Check (deterministic):**
+- Every FR has ≥1 scenario or explicit "verified by review"
+- No unresolved `OPEN:` items
+- Required sections present
+- Gherkin profile compliance
+
+**Check (advisory):**
+- FR completeness (LLM-assisted)
+- Scenario coverage adequacy (LLM-assisted)
 
 ---
 
@@ -218,7 +220,7 @@ EARS (Easy Approach to Requirements Syntax) has 5 patterns:
 **Validation rules:**
 - Every FR MUST use exactly one EARS pattern
 - FR ID format: `FR-###` (e.g., FR-001)
-- FR MUST trace to at least one parent (BR/JRN/BSC)
+- FR MUST trace to at least one parent requirement
 - FR MUST have at least one SCN or explicit "verified by review"
 
 ---
@@ -265,166 +267,135 @@ Scenario: Login test
   And check response cookie
 ```
 
-**BSC vs SCN distinction:**
-- **BSC** (Business Scenario): Business-level acceptance criteria, technology-agnostic
-- **SCN** (Scenario): Feature-level test scenario, may include technical details
-
 ---
 
-## 9. Phase P2 — Design
+## 9. Level 2 — Design
 
-### L3 Capability Design — `specs/20-capabilities/<cap>/design.md`
+**Question:** *How will we build it?*
 
-**Question:** *How does the system decompose, and where are the seams?*
+**Location:** `specs/design/`
 
-**Required fields:**
-- Bounded contexts/capabilities
-- Capability map
-- Cross-capability contracts
-- ADRs (`ADR-###`)
-- NFR allocations (ISO 25010 categories)
-- Capacity assumptions
-- Threat model summary (for security-relevant capabilities)
+**Files:**
+- `architecture.md` - System design, tech stack, repo layout (required for new projects)
+- `feature-specs/` - Per-feature specs (required)
+- `data-model.md` - Database schema (optional, if data persistence needed)
+- `security.md` - Security considerations (optional, if security-relevant)
+- `api-contracts.md` - API specifications (optional, if API-driven)
 
-**Gate G3:** Human approval via PR review; every non-obvious choice has an ADR.
+**Required for all features:**
+- `feature-specs/<feature>.md` with detailed FRs, API contracts, UI specs
 
-**Check (deterministic):**
-- Every capability traces to ≥1 BR/JRN
-- NFRs have target values or explicit "TBD + owner + deadline"
-- Required sections present
+**Optional:**
+- `architecture.md` (skip for small features, reuse existing architecture)
+- `data-model.md` (skip if no data persistence)
+- `security.md` (skip if no security concerns)
+- `api-contracts.md` (skip if no API)
 
-**Check (advisory):**
-- Capability boundary clarity (LLM-assisted)
+**Author:** Tech Lead + agent (human-led; agent structures).
 
----
-
-### L4 Feature Design — `specs/30-features/<feature>/spec.md`
-
-**Question:** *What must each feature do, precisely?*
-
-**Required fields:**
-- Feature summary
-- Parent capability
-- **FRs in EARS** (`FR-###`)
-- **NFRs** (`NFR-###`)
-- **Gherkin scenarios** (`SCN-###`)
-- API contracts
-- UI surface expectations
-- Data contracts
-- Trace links to BR/JRN
-- Threat model (if security-relevant)
-
-**Gate G4:** Human approval via PR review; every FR traces upward; every scenario is testable.
+**Gate G2:** Human approval via PR review.
 
 **Check (deterministic):**
-- FR format valid (EARS pattern)
-- Every FR has ≥1 scenario or explicit "verified by review"
+- Every FR from L1 is realized in design
+- API contracts match L1 requirements
 - No unresolved `OPEN:` items
-- Gherkin profile compliance
-- Required sections present
-
-**Check (advisory):**
-- FR completeness (LLM-assisted)
-- Scenario coverage adequacy (LLM-assisted)
-
----
-
-### L5 Technical Spec — `specs/40-tech/tech-spec.md`
-
-**Question:** *How is it built?*
-
-**Required fields:**
-- Stack & versions
-- Repo/module layout
-- Data model
-- Sequence diagrams
-- Failure modes & retries
-- Security model (including threat model, secrets handling, supply-chain security)
-- Observability (logging, metrics, alerting)
-- Migration plan
-- Environment strategy
-- Deployment strategy (including rollback plan)
-- SLOs and error budgets
-- Runbook links
-
-**Gate G5:** Human approval via PR review (may be light-touch for small features).
-
-**Check (deterministic):**
-- No unresolved `OPEN:` items
-- Every L4 contract realizable
-- ADRs referenced
 - Required sections present
 
 **Check (advisory):**
 - Architecture fitness (LLM-assisted)
+- Security adequacy (LLM-assisted)
 
 ---
 
-## 10. Phase P3 — Deliver
+## 10. Level 3 — Tasks
 
-### L6 Work Breakdown — `specs/50-work-breakdown.md`
+**Question:** *What exactly do we need to build?*
 
-**Question:** *What is the order and shape of the work?*
+**Location:** `specs/tasks/`
 
-**Hierarchy:** capability → feature → story (`ST-###`) → task (`TSK-###`)
+**Files:**
+- `backlog.md` - Prioritized task list (required)
+- `task-<ID>.md` - Individual task specs (required per task)
+- `impl-specs/` - Implementation notes (optional, for complex tasks)
 
-**Each story states:**
-- Value
-- Parent FRs
-- Acceptance pointer
-- Dependencies
-- Size estimate
-- Definition of Ready checklist
+**Task spec format:**
+```markdown
+# TSK-### Task Title
 
-**Gate G6:** Human approval via PR review (batch approval allowed for stories; still recorded).
+**ID:** TSK-###
+**Parent:** FR-###, SCN-###
+**Status:** Approved (via PR review)
+**Version:** 1.0
+
+## Scope
+What this task does
+
+## Non-Goals
+What this task does NOT do
+
+## Files Allowed to Change
+- src/file1.ts
+- src/file2.ts
+
+## Acceptance Criteria
+1. Criterion 1
+2. Criterion 2
+
+## Validation Command
+```bash
+npm test -- task.test.ts
+```
+
+## Stop Conditions
+- Condition 1
+- Condition 2
+
+## Risk Notes
+- Risk 1
+- Risk 2
+
+## Definition of Done
+- [ ] Code implemented
+- [ ] Tests pass
+- [ ] Code review approved
+- [ ] Evidence captured
+- [ ] Traceability updated
+```
+
+**Author:** Tech Lead + agent (human-led; agent structures).
+
+**Gate G3:** Human approval via PR review (batch approval allowed for small tasks).
 
 **Check (deterministic):**
-- Every story traces to ≥1 FR
-- No orphan stories
-- Dependency graph acyclic
-- Definition of Ready checklist complete
-
----
-
-### L7 Task Spec — `specs/60-tasks/<TSK-id>/spec.md`
-
-**Question:** *Exactly what does this one task do?*
-
-**Required fields:**
-- Parent story/FRs
-- Scope
-- **Non-goals**
-- Files/components allowed to change
-- Acceptance criteria
-- **Validation command**
-- **Stop conditions**
-- Risk notes
-- Definition of Done checklist
-
-**Gate G7:** Human approval via PR review. Small tasks may be approved in batches; each approval is recorded against the task ID.
-
-**Check (deterministic):**
-- Size limit (~1 day)
-- Every task traces to FR/bug ID
+- Every task traces to ≥1 FR
+- No orphan tasks
 - Validation command exists
-- Definition of Done checklist complete
 - Files allowed to change are scoped
+- Definition of Done checklist complete
 
 ---
 
-### L8 Test Plan — `specs/70-tests/test-plan.md`
+## 11. Level 4 — Verification
 
-**Question:** *How will we prove every requirement?*
+**Question:** *How will we prove every requirement is met?*
 
-**Required fields:**
-- Matrix mapping every FR/NFR/SCN/BSC → test IDs (`TST-###`)
-- Test type (unit / integration / e2e / NFR / security / chaos)
-- Coverage policy per NFR category
-- Justified manual-only items
-- Test data strategy
-- Test environment requirements
+**Location:** `specs/verification/`
 
-**Gate G8:** Human approval via PR review.
+**Files:**
+- `test-plan.md` - Test strategy and coverage matrix (required)
+- `evidence/` - Test results, CI outputs (required)
+- `impl-specs/` - Implementation notes (optional)
+
+**Required for all features:**
+- `test-plan.md` with coverage matrix mapping FRs/NFRs/SCNs → TSTs
+- `evidence/` directory with test results
+
+**Optional:**
+- `impl-specs/` for complex implementation details
+
+**Author:** QA Lead + agent (human-led; agent structures).
+
+**Gate G4:** Human approval via PR review.
 
 **Check (deterministic, blocking):**
 - **Every FR/NFR/SCN has ≥1 test ID**
@@ -441,113 +412,81 @@ Scenario: Login test
 - Test file changes require explicit review by QA Lead
 - Test weakening (removing assertions, reducing coverage) is prohibited without approval
 
----
-
-### L9 Implementation Spec — `specs/60-tasks/<TSK-id>/impl-spec.md`
-
-**Question:** *How will this task be implemented?*
-
-**Written before code:**
-- Approach
-- Files to touch
-- Key commands
-- Gotchas
-- Links to relevant L4/L5 sections
-- Expected evidence output
-- Rollback plan (if applicable)
-
-**Gate G9:** Human approval via PR review (can batch with G7 for small tasks).
-
-**Check (deterministic):**
-- Impl-spec exists for every task before its code is merged
-- Required sections present
-
-**Verification:**
-- Agent runs validation command
-- Evidence captured from CI exit codes, not agent opinion
-- Separate agent session reviews evidence for pass/fail determination
+**Evidence storage:**
+- CI output saved to `specs/verification/evidence/<TSK-ID>-<date>.log`
+- Evidence includes: command, exit code, stdout, stderr, timestamp
+- Evidence is immutable once created
+- Evidence links are referenced in task specs
 
 ---
 
-## 11. Phase P4 — Integrate & Release
-
-### L10 Integration Spec — `specs/80-integration/integration-spec.md`
+## 12. Level 5 — Integration (Optional)
 
 **Question:** *Do the pieces work together?*
 
-**Required fields:**
-- Cross-feature flows
-- Contract verification
-- Data migration verification
-- Golden-path e2e scenarios
-- Rollout/rollback plan (detailed, tested)
-- Release checklist
-- Smoke test plan
-- Canary deployment plan (if applicable)
+**When to use:** Multi-feature releases, cross-service integration, complex deployments.
 
-**Gate G10:** Human approval via PR review; golden-path e2e must pass before release.
+**Location:** `specs/integration/`
+
+**Files:**
+- `integration-spec.md` - Cross-feature flows, contract verification
+- `release-<date>.md` - Release record
+- `rollback-plan.md` - Rollback strategy
+
+**Gate G5:** Human approval via PR review; golden-path e2e must pass before release.
 
 **Check (deterministic):**
-- Every L4 cross-capability contract has an integration test
+- Every cross-feature contract has an integration test
 - Rollback plan is documented and tested
 - Smoke tests defined
 
 ---
 
-### Release Record — `specs/80-integration/release-<date>.md`
-
-**Required fields:**
-- Version
-- Spec versions shipped (with commit SHAs)
-- Evidence bundle links
-- Known limitations
-- Deployment information
-- Post-release monitoring plan
-
----
-
-## 12. Phase P5 — Distill
-
-### L11 Release & Learning — `specs/90-distill/<date>-<release>.md`
+## 13. Level 6 — Release & Learning (Optional)
 
 **Question:** *What did we learn, and what changes upstream?*
 
+**When to use:** After every release, for continuous improvement.
+
+**Location:** `specs/release/`
+
+**Files:**
+- `<date>-<version>.md` - Release and learning document
+
 **Required fields:**
 - What shipped vs spec
-- Metrics vs L1 success criteria
+- Metrics vs success criteria
 - Surprises/defects
-- **Spec changes made** (with IDs and reasons)
+- Spec changes made (with IDs and reasons)
 - New insights routed to L1/L2
 - Process improvements identified
 
-**Gate G11:** Human review via PR; produces either spec-change requests or explicit "no change".
+**Gate G6:** Human review via PR; produces either spec-change requests or explicit "no change".
 
 **Rule:** Every release yields ≥1 recorded outcome (change or explicit no-change).
 
 ---
 
-## 13. Rigor Levels
+## 14. Rigor Levels
 
 The framework supports three rigor levels determined by **risk**, not duration:
 
-| Rigor Level | Risk Profile | Required Gates | Traceability Scope | Examples |
+| Rigor Level | Risk Profile | Required Levels | Required Gates | Examples |
 |---|---|---|---|---|
-| **Light** | Low risk, internal tools, prototypes | G1, G4, G7, G10 | FR → TSK → TST | Internal dashboard, CLI tool, prototype |
-| **Standard** | Medium risk, customer features | G1, G2, G4, G5, G7, G8, G10 | Full chain except L3/L5 if simple | API endpoint, user-facing feature |
-| **Heavy** | High risk, payments, security, compliance, data | All gates G0-G11 + security review | Full chain with security review | Checkout flow, auth system, PII handling |
+| **Minimal** | Low risk, internal tools, prototypes | L1, L3, L4 | G1, G3, G4 | Internal dashboard, CLI tool, bug fix |
+| **Standard** | Medium risk, customer features | L1, L2, L3, L4 | G1, G2, G3, G4 | API endpoint, user-facing feature |
+| **Full** | High risk, payments, security, compliance | All levels | All gates | Checkout flow, auth system, PII handling |
 
 **Rigor level selection:**
-- Declared in project `constitution.md`
+- Declared in project `AGENTS.md` or `constitution.md`
 - **MUST** be based on risk assessment, not duration
 - Can be overridden per-feature with documented rationale and approver sign-off
 - Default is **Standard**
-- **Light** rigor skips L2 (Business Spec) and L3 (Capability Design)
-- **Heavy** rigor adds security review gate (G3.5) and chaos testing requirement
 
 **Risk assessment criteria:**
-- **Light:** No user data, no external integrations, easily reversible
+- **Minimal:** No user data, no external integrations, easily reversible
 - **Standard:** User data, external integrations, moderate complexity
-- **Heavy:** Payment/PII data, security-critical, compliance requirements, irreversible actions
+- **Full:** Payment/PII data, security-critical, compliance requirements, irreversible actions
 
 **Downgrade approval:**
 - Reducing rigor level requires explicit approval from Tech Lead + Product Owner
@@ -556,37 +495,37 @@ The framework supports three rigor levels determined by **risk**, not duration:
 
 ---
 
-## 14. Traceability Model (Blocking)
+## 15. Traceability Model (Blocking)
 
-### Canonical Chain
+### Core Chain (Required)
 
 ```
-BC → BR/JRN/BSC → CAP/ADR → FR/NFR/SCN → TST → ST → TSK → IMPL → INT → REL
-Bug fixes enter at the level where the defect lives, with a BUG-### ID.
+REQ → FR/NFR → SCN → TSK → TST → IMPL → REL
 ```
 
-**Note:** TST comes before ST/TSK in the chain because tests are defined in L8 (Test Plan) before tasks are broken down in L6/L7.
+### Extended Chain (Optional)
+
+```
+CONST → ARCH → CAP → ADR → INT → DIST
+```
 
 ### ID Prefixes
 
 | Prefix | Type | Level |
 |---|---|---|
-| BC | Business Case | L1 |
-| ACT | Actor | L2 |
-| JRN | Journey | L2 |
-| BR | Business Rule | L2 |
-| BSC | Business Scenario | L2 |
-| CAP | Capability | L3 |
-| ADR | Architecture Decision | L3 |
-| FR | Functional Requirement | L4 |
-| NFR | Non-Functional Requirement | L4 |
-| SCN | Scenario | L4 |
-| ST | Story | L6 |
-| TSK | Task | L7 |
-| TST | Test | L8 |
-| IMPL | Implementation Spec | L9 |
-| INT | Integration | L10 |
-| REL | Release | L10 |
+| REQ | Requirement | L1 |
+| FR | Functional Requirement | L1/L2 |
+| NFR | Non-Functional Requirement | L1/L2 |
+| SCN | Scenario | L1 |
+| BSC | Business Scenario | L1 (optional) |
+| ARCH | Architecture | L2 |
+| CAP | Capability | L2 (optional) |
+| ADR | Architecture Decision | L2 (optional) |
+| TSK | Task | L3 |
+| TST | Test | L4 |
+| IMPL | Implementation Spec | L4 (optional) |
+| INT | Integration | L5 (optional) |
+| REL | Release | L5/L6 (optional) |
 | BUG | Bug | Any level |
 | D | Decision | Any level |
 
@@ -611,11 +550,11 @@ For legacy code without specs:
 - **Path-scoped coverage:** Only new/modified code paths require spec coverage
 - **Baseline specs:** Generate "current behaviour" specs as baseline (marked `source: reverse-engineered`)
 - **Gradual migration:** New features use full SDD, bug fixes use abbreviated process
-- **Coverage scope:** Defined in `constitution.md` (e.g., "only `src/payments/` requires full SDD")
+- **Coverage scope:** Defined in `AGENTS.md` (e.g., "only `src/payments/` requires full SDD")
 
 ---
 
-## 15. Approval Mechanism
+## 16. Approval Mechanism
 
 ### Approval is External to Files
 
@@ -650,7 +589,7 @@ For legacy code without specs:
 
 ---
 
-## 16. Validation & Consistency Checks
+## 17. Validation & Consistency Checks
 
 ### Deterministic Checks (Blocking)
 
@@ -672,7 +611,7 @@ These checks MUST pass for merge:
 
 **Coverage:**
 - Every NFR category addressed or explicitly waived
-- Every journey reachable by ≥1 scenario
+- Every scenario reachable by ≥1 test
 
 **Drift:**
 - Spec version referenced by code/tasks matches latest approved version
@@ -696,56 +635,56 @@ These checks are logged but do not block merge:
 
 ---
 
-## 17. Tooling & Portability
+## 18. Tooling & Portability
 
 ### Canonical Store
 
-`specs/` + `constitution.md` + `sdd-core/` playbooks/templates — plain Markdown + `traceability.yaml` in git. Tool-agnostic by construction.
+`specs/` + `AGENTS.md` + `sdd-core/` playbooks/templates — plain Markdown + `traceability.yaml` in git. Tool-agnostic by construction.
 
 ### Single Entry Point: `AGENTS.md`
 
 **All AI tools MUST use a single `AGENTS.md` file as the entry point.** This file contains:
 - Framework overview and navigation
 - Links to canonical spec files
-- Tool-specific instructions (minimal)
-- Context pack definitions (see Section 19.5)
+- Context pack definitions (see Section 20.5)
+- Project-specific rules
 
 **Example `AGENTS.md` structure:**
 ```markdown
 # AI Agent Instructions
 
 ## Framework Overview
-This project uses Spec-Driven Development (SDD-F v2.0).
+This project uses Spec-Driven Development (SDD-F v3.0).
 See `SDD-Framework.md` for complete documentation.
 
 ## Context Packs
-- For task implementation: Load `specs/60-tasks/<TSK-ID>/spec.md` + `impl-spec.md` + relevant L4/L5 sections
-- For spec creation: Load parent spec + template + constitution
-- See Section 19.5 for detailed context pack definitions
+- For task implementation: Load `specs/tasks/<TSK-ID>.md` + relevant L1/L2 sections
+- For spec creation: Load parent spec + template + AGENTS.md
+- See Section 20.5 for detailed context pack definitions
 
-## Tool-Specific Notes
-[Minimal tool-specific instructions if needed]
+## Project Structure
+- `specs/requirements/` - What/why we're building
+- `specs/design/` - How we'll build it
+- `specs/tasks/` - What to build
+- `specs/verification/` - How we'll prove it works
+- `specs/evidence/` - Test results and CI outputs
+
+## Key Rules
+- All specs MUST trace to parent requirements
+- Tests MUST derive from approved scenarios
+- Approvals are external (PR review), not in file headers
+- Use RFC 2119 normative language (MUST/SHOULD/MAY)
+- Context packs define minimal spec loading per task
 ```
 
-### Optional Thin Adapters
+### No Tool-Specific Adapters
 
-**Only create thin adapters when a tool requires specific file formats:**
+**Adapters for specific tools (Devin, Claude, Cursor, etc.) are NOT required.** The single `AGENTS.md` file works with all AI tools that support file reading.
 
-| Tool | When Needed | Adapter emits |
-|---|---|---|
-| Devin | If using Devin skills | `.devin/skills/sdd/SKILL.md` (pointer to AGENTS.md) |
-| Claude Code | If using Claude skills | `.claude/skills/sdd/SKILL.md` (pointer to AGENTS.md) |
-| Cursor | If using Cursor rules | `.cursor/rules/sdd.mdc` (pointer to AGENTS.md) |
-
-**Adapter principle:** Adapters are thin pointers, not duplications. They reference `AGENTS.md` and canonical specs, never copy content.
-
-### No Compatibility Emitters
-
-**Compatibility emitters (Spec Kit, Kiro, OpenSpec) are NOT supported.** Rationale:
-- High maintenance burden (3 additional integration points)
-- Tool formats change frequently
-- Not worth the complexity for marginal benefit
-- Users can manually adapt specs if needed
+**If a tool requires specific file formats:**
+- Create a thin pointer file (e.g., `.devin/skills/sdd/SKILL.md`)
+- The pointer references `AGENTS.md`, never duplicates content
+- Maintain minimal tool-specific files only when absolutely necessary
 
 ### Executable Specs
 
@@ -753,19 +692,21 @@ Deferred to Phase P4 (Ecosystem). Gherkin scenarios are authored now in structur
 
 ---
 
-## 18. Tooling Specification
+## 19. Tooling Specification
 
-### 18.1 Validator CLI (`sdd-validate`)
+### 19.1 Validator CLI (`sdd-validate`)
 
 **Purpose:** Validate spec files against framework rules
 
 **Commands:**
 ```bash
-sdd-validate constitution.md                    # Validate constitution
-sdd-validate specs/ --level L4                  # Validate all L4 specs
-sdd-validate specs/30-features/login/spec.md    # Validate single file
-sdd-validate specs/ --traceability              # Validate traceability chain
-sdd-validate specs/ --ci                        # CI mode (exit 1 on failure)
+sdd-validate AGENTS.md                        # Validate project config
+sdd-validate specs/requirements/              # Validate requirements
+sdd-validate specs/design/feature-specs/      # Validate design specs
+sdd-validate specs/tasks/                     # Validate task specs
+sdd-validate specs/verification/              # Validate verification specs
+sdd-validate specs/ --traceability            # Validate traceability chain
+sdd-validate specs/ --ci                      # CI mode (exit 1 on failure)
 ```
 
 **Deterministic validation rules:**
@@ -774,7 +715,7 @@ sdd-validate specs/ --ci                        # CI mode (exit 1 on failure)
 - ID uniqueness across project
 - Status transitions legal
 - Parent-child relationships valid
-- No orphan artifacts (traceability rules from Section 14)
+- No orphan artifacts (traceability rules from Section 15)
 - Approved specs match commit SHA
 - Gherkin profile compliance (structural only)
 
@@ -791,7 +732,7 @@ sdd-validate specs/ --ci                        # CI mode (exit 1 on failure)
 
 ---
 
-### 18.2 Traceability Generator (`sdd-trace`)
+### 19.2 Traceability Generator (`sdd-trace`)
 
 **Purpose:** Generate traceability.yaml and dependency graph
 
@@ -811,15 +752,16 @@ sdd-trace specs/ --orphans                      # Show orphan detection report
 
 ---
 
-### 18.3 Template Generator (`sdd-template`)
+### 19.3 Template Generator (`sdd-template`)
 
 **Purpose:** Generate markdown templates for each level
 
 **Commands:**
 ```bash
-sdd-template L1 > specs/00-business-case.md
-sdd-template L4 --feature login > specs/30-features/login/spec.md
-sdd-template TSK-001 > specs/60-tasks/TSK-001/spec.md
+sdd-template L1-requirements > specs/requirements/requirements.md
+sdd-template L2-design --feature login > specs/design/feature-specs/login.md
+sdd-template L3-task TSK-001 > specs/tasks/task-001.md
+sdd-template L4-verification > specs/verification/test-plan.md
 sdd-template --list                             # List all available templates
 ```
 
@@ -831,29 +773,97 @@ sdd-template --list                             # List all available templates
 
 ---
 
-### 18.4 Adapter Generator (`sdd-adapter`)
+## 20. AI Agent Playbooks
 
-**Purpose:** Generate tool-specific skill/rule files
+### 20.0 Agent Commands
 
-**Commands:**
-```bash
-sdd-adapter --tool devin > .devin/skills/sdd/SKILL.md
-sdd-adapter --tool claude > CLAUDE.md
-sdd-adapter --tool cursor > .cursor/rules/sdd.mdc
-sdd-adapter --tool all                           # Generate all adapters
+**Purpose:** Define how to invoke the agent for each framework step.
+
+**Command Format:**
+```
+@agent <command> [arguments]
 ```
 
-**Output:**
-- Tool-specific configuration files
-- References to canonical framework docs
-- Tool-specific prompt templates
-- CI/CD integration snippets
+**Available Commands:**
+
+| Command | Level | Purpose | Context Pack |
+|---|---|---|---|
+| `@agent elicit L1` | L1 Requirements | Elicit requirements through questions | ~4K tokens |
+| `@agent draft L1` | L1 Requirements | Draft requirements spec | ~8K tokens |
+| `@agent challenge L1` | L1 Requirements | Challenge requirements for review | ~8K tokens |
+| `@agent verify L1` | L1 Requirements | Verify requirements completeness | ~4K tokens |
+| `@agent elicit L2` | L2 Design | Elicit design through questions | ~8K tokens |
+| `@agent draft L2` | L2 Design | Draft design spec | ~12K tokens |
+| `@agent challenge L2` | L2 Design | Challenge design for review | ~12K tokens |
+| `@agent verify L2` | L2 Design | Verify design completeness | ~8K tokens |
+| `@agent elicit L3` | L3 Tasks | Elicit tasks through questions | ~8K tokens |
+| `@agent draft L3` | L3 Tasks | Draft task specs | ~12K tokens |
+| `@agent challenge L3` | L3 Tasks | Challenge tasks for review | ~12K tokens |
+| `@agent verify L3` | L3 Tasks | Verify task completeness | ~8K tokens |
+| `@agent elicit L4` | L4 Verification | Elicit verification approach | ~12K tokens |
+| `@agent draft L4` | L4 Verification | Draft test plan | ~16K tokens |
+| `@agent challenge L4` | L4 Verification | Challenge test plan | ~16K tokens |
+| `@agent verify L4` | L4 Verification | Verify test coverage | ~12K tokens |
+| `@agent implement TSK-###` | Implementation | Implement specific task | ~16K tokens |
+| `@agent verify TSK-###` | Verification | Verify task implementation | ~8K tokens |
+| `@agent validate` | All | Run full validation suite | ~4K tokens |
+| `@agent trace` | All | Generate traceability matrix | ~4K tokens |
+
+**Usage Examples:**
+
+```bash
+# Elicit requirements for login feature
+@agent elicit L1 --feature login
+
+# Draft requirements spec
+@agent draft L1 --feature login --parent BC-001
+
+# Challenge requirements for review
+@agent challenge L1 --feature login
+
+# Implement specific task
+@agent implement TSK-007
+
+# Verify task implementation
+@agent verify TSK-007
+
+# Run full validation
+@agent validate --all
+
+# Generate traceability
+@agent trace --output traceability.yaml
+```
+
+**Command Arguments:**
+- `--feature <name>` - Feature name for context
+- `--parent <ID>` - Parent spec ID for traceability
+- `--level <L#>` - Specific level (L1-L6)
+- `--task <TSK-ID>` - Specific task ID
+- `--all` - Apply to all specs/tasks
+- `--output <file>` - Output file path
+
+**Context Pack Integration:**
+Each command automatically loads the appropriate context pack:
+- `@agent implement TSK-###` loads: TSK spec + relevant L1/L2 sections + L4 test plan
+- `@agent draft L1` loads: AGENTS.md + L1 template + parent context
+- `@agent verify TSK-###` loads: TSK spec + CI evidence + L4 test plan
+
+**Agent Session Management:**
+- `@agent elicit` → Creates new session for questions
+- `@agent draft` → Creates new session for drafting
+- `@agent challenge` → Creates separate session (different agent)
+- `@agent verify` → Creates separate session (different agent)
+- `@agent implement` → Creates session for implementation
+- `@agent verify` → Creates separate session for verification
+
+**Error Handling:**
+- Invalid command → Returns usage instructions
+- Missing context → Returns error with required context pack
+- Validation failure → Returns specific error with fix suggestions
 
 ---
 
-## 19. AI Agent Playbooks
-
-### 19.1 Micro-Cycle Phase: Elicit
+### 20.1 Micro-Cycle Phase: Elicit
 
 **Agent Prompt Template (Phase 1: Questions):**
 ```
@@ -861,7 +871,7 @@ You are helping elicit requirements for [LEVEL].
 
 Current context:
 - Parent artifact: [PARENT_FILE]
-- Project constitution: [CONSTITUTION_FILE]
+- Project configuration: [AGENTS_MD]
 
 Your task:
 1. Review the parent artifact and identify gaps
@@ -881,7 +891,7 @@ You are drafting [LEVEL] artifact [ID] based on elicitation answers.
 Inputs:
 - Parent artifact: [PARENT_FILE]
 - Elicitation answers: [ANSWERS_FILE]
-- Constitution: [CONSTITUTION_FILE]
+- Project configuration: [AGENTS_MD]
 - Template: [TEMPLATE_FILE]
 
 Rules:
@@ -902,7 +912,7 @@ Output: Complete markdown file with all required sections
 
 ---
 
-### 19.2 Micro-Cycle Phase: Draft
+### 20.2 Micro-Cycle Phase: Draft
 
 **Agent Prompt Template:**
 ```
@@ -910,7 +920,7 @@ You are drafting [LEVEL] artifact [ID].
 
 Inputs:
 - Parent artifact: [PARENT_FILE]
-- Constitution: [CONSTITUTION_FILE]
+- Project configuration: [AGENTS_MD]
 - Template: [TEMPLATE_FILE]
 
 Rules:
@@ -926,7 +936,7 @@ Output: Complete markdown file with all required sections
 
 ---
 
-### 19.3 Micro-Cycle Phase: Challenge
+### 20.3 Micro-Cycle Phase: Challenge
 
 **Agent Prompt Template (Separate Session):**
 ```
@@ -960,7 +970,7 @@ Output format:
 
 ---
 
-### 19.4 Micro-Cycle Phase: Verify
+### 20.4 Micro-Cycle Phase: Verify
 
 **Agent Prompt Template (Separate Session):**
 ```
@@ -991,14 +1001,14 @@ Output format:
 ```
 
 **Evidence storage:**
-- CI output saved to `specs/evidence/<TSK-ID>-<date>.log`
+- CI output saved to `specs/verification/evidence/<TSK-ID>-<date>.log`
 - Evidence includes: command, exit code, stdout, stderr, timestamp
 - Evidence is immutable once created
-- Evidence links are referenced in impl-spec
+- Evidence links are referenced in task specs
 
 ---
 
-### 19.5 Context Packs
+### 20.5 Context Packs
 
 **Purpose:** Define minimal spec loading per task type to stay within context windows.
 
@@ -1008,18 +1018,13 @@ Output format:
 
 | Task Type | Required Specs | Optional Specs | Max Context |
 |---|---|---|---|
-| **L1 Business Case** | Constitution, L1 template | Stakeholder interview notes | ~4K tokens |
-| **L2 Business Spec** | Constitution, L1 spec, L2 template | Glossary, open questions | ~8K tokens |
-| **L3 Capability Design** | Constitution, L2 specs (BR/JRN), L3 template | ADRs, NFR allocations | ~12K tokens |
-| **L4 Feature Spec** | Constitution, L3 spec, L4 template, relevant BR/JRN | API contracts, UI specs | ~16K tokens |
-| **L5 Tech Spec** | Constitution, L4 spec, L5 template | Security model, deployment strategy | ~20K tokens |
-| **L6 Work Breakdown** | Constitution, L4 specs, L6 template | Story dependencies | ~12K tokens |
-| **L7 Task Spec** | Constitution, L6 breakdown, L7 template, relevant FRs | Risk notes, dependencies | ~8K tokens |
-| **L8 Test Plan** | Constitution, L4 specs (FR/NFR/SCN), L8 template | Coverage policy, test data | ~16K tokens |
-| **L9 Impl Spec** | Constitution, L7 task spec, L9 template, relevant L4/L5 sections | Gotchas, commands | ~12K tokens |
-| **L10 Integration** | Constitution, L4 specs, L10 template, integration contracts | Rollout plan, smoke tests | ~20K tokens |
-| **Implementation (TSK)** | TSK spec, IMPL spec, relevant L4 FRs, L5 tech spec sections | Test plan, evidence format | ~24K tokens |
-| **Verification** | TSK spec, IMPL spec, CI evidence | Test results, coverage | ~12K tokens |
+| **L1 Requirements** | AGENTS.md, L1 template | Stakeholder interview notes | ~4K tokens |
+| **L2 Design** | AGENTS.md, L1 specs, L2 template | Architecture docs, security specs | ~8K tokens |
+| **L3 Tasks** | AGENTS.md, L2 specs, L3 template | Task dependencies | ~8K tokens |
+| **L4 Verification** | AGENTS.md, L1/L2 specs, L4 template | Coverage policy, test data | ~12K tokens |
+| **L5 Integration** | AGENTS.md, L1/L2 specs, L5 template | Integration contracts | ~16K tokens |
+| **Implementation (TSK)** | TSK spec, relevant L1/L2 sections, L4 test plan | Evidence format | ~16K tokens |
+| **Verification** | TSK spec, CI evidence, L4 test plan | Test results, coverage | ~8K tokens |
 
 #### Context Pack Rules
 
@@ -1031,55 +1036,53 @@ Output format:
 
 #### Context Budget Guidelines
 
-- **Small tasks (< 2 hours):** Max 12K tokens context
-- **Medium tasks (2-8 hours):** Max 20K tokens context
-- **Large tasks (> 8 hours):** Max 32K tokens context
-- **Spec creation:** Max 16K tokens context
+- **Small tasks (< 2 hours):** Max 8K tokens context
+- **Medium tasks (2-8 hours):** Max 16K tokens context
+- **Large tasks (> 8 hours):** Max 24K tokens context
+- **Spec creation:** Max 12K tokens context
 
 #### Context Pack Example: Implementing TSK-007
 
 **Task:** Implement login form component
 
 **Required Specs:**
-- `specs/60-tasks/TSK-007/spec.md` (task requirements)
-- `specs/60-tasks/TSK-007/impl-spec.md` (implementation approach)
-- `specs/30-features/login/spec.md` (FR-001, FR-004 only)
-- `specs/40-tech/tech-spec.md` (API contracts section only)
+- `specs/tasks/task-007.md` (task requirements)
+- `specs/requirements/requirements.md` (FR-001, FR-004 only)
+- `specs/design/feature-specs/login.md` (relevant sections only)
+- `specs/verification/test-plan.md` (TST-001 section only)
 
 **Optional Specs:**
-- `specs/70-tests/test-plan.md` (TST-001 section only)
-- `constitution.md` (coding conventions section only)
+- `AGENTS.md` (coding conventions section only)
 
 **NOT Loaded:**
-- L1 Business Case (not needed for implementation)
-- L2 Business Spec (not needed for implementation)
-- L3 Capability Design (not needed for implementation)
 - Other features' specs
-- Full tech spec (only relevant sections)
+- Full architecture docs
+- Full tech spec
+- Business case (not needed for implementation)
 
-**Total Context:** ~18K tokens (within budget for medium task)
+**Total Context:** ~14K tokens (within budget for medium task)
 
 ---
 
-## 20. Brownfield Entry
+## 21. Brownfield Entry
 
 ### Phase P0.5: Reverse Engineering
 
-Before any change spec, generate "current behaviour" specs. **Do NOT convert existing tests to BSC scenarios** — tests are implementation details, not business requirements.
+Before any change spec, generate "current behaviour" specs. **Do NOT convert existing tests to scenarios** — tests are implementation details, not business requirements.
 
 **Step 1: Behavior Spec Generation**
 
 Generate baseline specs from **documented behavior and contracts**, not tests:
 
 - **API contracts:** Analyze OpenAPI/Swagger specs, GraphQL schemas → document as FRs
-- **User documentation:** Extract documented features → document as BRs/JRNs
-- **Code analysis:** Identify business logic patterns → document as BRs
-- **Database schema:** Map data model → document in tech spec
-- **Interview maintainers:** Capture unwritten business rules → document as BRs
+- **User documentation:** Extract documented features → document as requirements
+- **Code analysis:** Identify business logic patterns → document as rules
+- **Database schema:** Map data model → document in design specs
+- **Interview maintainers:** Capture unwritten business rules → document as requirements
 - **Generate "baseline specs"** marked with `source: reverse-engineered` and `confidence: low`
 
 **Do NOT:**
-- Convert unit/integration tests to BSC scenarios (tests ≠ business requirements)
+- Convert unit/integration tests to scenarios (tests ≠ business requirements)
 - Assume existing behavior is correct (may be bugs)
 - Skip human validation of baseline specs
 
@@ -1107,7 +1110,7 @@ Generate baseline specs from **documented behavior and contracts**, not tests:
   - Legacy refactors: delta specs only
 
 **Step 5: Hybrid Mode**
-- Define "SDD coverage scope" in `constitution.md`
+- Define "SDD coverage scope" in `AGENTS.md`
 - Options:
   - **Full coverage:** All new code uses SDD
   - **High-risk only:** Only payment/auth/data modules use SDD
@@ -1116,7 +1119,7 @@ Generate baseline specs from **documented behavior and contracts**, not tests:
 - Bug fixes enter at appropriate level with BUG-### ID
 
 **Path-scoped coverage rules:**
-- Define in `constitution.md`: `sdd_coverage_paths: ["src/payments/", "src/auth/"]`
+- Define in `AGENTS.md`: `sdd_coverage_paths: ["src/payments/", "src/auth/"]`
 - CI check validates that changes in these paths have corresponding spec changes
 - Changes outside these paths do not require spec coverage
 - New paths can be added to coverage scope with Tech Lead approval
@@ -1128,7 +1131,7 @@ Generate baseline specs from **documented behavior and contracts**, not tests:
 
 ---
 
-## 21. Versioning & Change Control
+## 22. Versioning & Change Control
 
 - Specs are versioned; approvals bind to commit SHA (not version number).
 - Changes follow the same micro-cycle (no silent edits to approved specs).
@@ -1138,11 +1141,11 @@ Generate baseline specs from **documented behavior and contracts**, not tests:
 
 ---
 
-## 22. Security Requirements
+## 23. Security Requirements
 
 ### Threat Modeling
 
-Every capability design (L3) MUST include a threat model summary for security-relevant capabilities:
+For security-relevant features, design specs MUST include a threat model summary:
 - Assets at risk
 - Threat actors
 - Attack vectors
@@ -1154,7 +1157,7 @@ Every capability design (L3) MUST include a threat model summary for security-re
 - Secrets MUST NOT be stored in spec files
 - Secrets MUST be referenced by environment variable names only
 - Secrets MUST be managed via secrets manager (AWS Secrets Manager, Vault, etc.)
-- Secrets rotation policy MUST be documented in tech spec
+- Secrets rotation policy MUST be documented in design specs
 
 ### Supply-Chain Security
 
@@ -1165,25 +1168,25 @@ Every capability design (L3) MUST include a threat model summary for security-re
 
 ### Privacy & Compliance
 
-- PII handling MUST be documented in tech spec
+- PII handling MUST be documented in design specs
 - Data retention policies MUST be specified
 - GDPR/CCPA compliance requirements MUST be addressed if applicable
 - Audit logging requirements MUST be specified
 
 ---
 
-## 23. Operations Requirements
+## 24. Operations Requirements
 
 ### SLOs and Error Budgets
 
-Tech spec (L5) MUST define:
-- Service Level Objectives (SLOs) for critical features
+Design specs MUST define for critical features:
+- Service Level Objectives (SLOs)
 - Error budgets and burn rate alerts
 - SLO review cadence
 
 ### Deployment Strategy
 
-Tech spec (L5) MUST define:
+Design specs MUST define:
 - Deployment strategy (blue-green, canary, rolling)
 - Rollback plan (tested, documented)
 - Smoke test plan
@@ -1191,7 +1194,7 @@ Tech spec (L5) MUST define:
 
 ### Runbooks
 
-Tech spec (L5) MUST link to or include:
+Design specs MUST link to or include:
 - Incident response runbook
 - Common failure modes and resolutions
 - Escalation contacts
@@ -1199,7 +1202,7 @@ Tech spec (L5) MUST link to or include:
 
 ### Observability
 
-Tech spec (L5) MUST define:
+Design specs MUST define:
 - Logging strategy (structured, searchable)
 - Metrics and dashboards
 - Alerting rules and thresholds
@@ -1207,13 +1210,13 @@ Tech spec (L5) MUST define:
 
 ---
 
-## 24. Process Requirements
+## 25. Process Requirements
 
 ### Definition of Ready (DoR)
 
 A task is "ready" when:
 - [ ] Task spec exists and is approved
-- [ ] Impl spec exists and is approved
+- [ ] Implementation spec exists (if required)
 - [ ] Dependencies are complete
 - [ ] Files allowed to change are scoped
 - [ ] Validation command exists
@@ -1223,7 +1226,7 @@ A task is "ready" when:
 ### Definition of Done (DoD)
 
 A task is "done" when:
-- [ ] Code implemented per impl spec
+- [ ] Code implemented per spec
 - [ ] All tests pass (unit + integration)
 - [ ] Code review approved
 - [ ] Spec updated if implementation revealed gaps
@@ -1251,14 +1254,14 @@ For production incidents:
 
 ---
 
-## 25. Scale Considerations
+## 26. Scale Considerations
 
 ### Multi-Service/Multi-Repo
 
 For systems with multiple services or repositories:
 - Each service/repo has its own `specs/` directory
-- Cross-service contracts documented in capability design (L3)
-- Integration specs (L10) cover cross-service flows
+- Cross-service contracts documented in design specs
+- Integration specs (L5) cover cross-service flows
 - Traceability spans service boundaries via contract IDs
 
 ### Parallel Agents
@@ -1279,13 +1282,13 @@ For large codebases:
 
 ---
 
-## 26. Evidence Storage
+## 27. Evidence Storage
 
 ### Location
 
-`specs/evidence/` directory with structure:
+`specs/verification/evidence/` directory with structure:
 ```
-specs/evidence/
+specs/verification/evidence/
   <TSK-ID>-
     <date>-
       command.log
@@ -1312,43 +1315,44 @@ Each evidence file includes:
 
 ---
 
-## 27. Meta-Content vs Normative Text
+## 28. Meta-Content vs Normative Text
 
 ### Normative Text (MUST/SHOULD/MAY)
 
-Sections 1-26 contain normative requirements using RFC 2119 keywords. This includes subsections (e.g., 19.5 Context Packs).
+Sections 1-27 contain normative requirements using RFC 2119 keywords.
 
 ### Meta-Content (Informational)
 
 The following sections are informational and do not contain requirements:
-- This section (27)
-- Section 28 (Decisions Log)
-- Section 29 (Open Items)
-- Section 30 (Adoption Roadmap)
+- This section (28)
+- Section 29 (Decisions Log)
+- Section 30 (Open Items)
+- Section 31 (Adoption Roadmap)
 
 ### Section Numbering
 
-All sections use sequential numbering (1-30). Subsections use decimal notation (e.g., 19.5). No decimal numbering for top-level sections to avoid confusion.
+All sections use sequential numbering (1-31). Subsections use decimal notation (e.g., 20.5). No decimal numbering for top-level sections.
 
 ---
 
-## 28. Decisions Log
+## 29. Decisions Log
 
-- First target: **general framework for any app**
-- Rigour: **configurable via rigor levels** (Light/Standard/Heavy) determined by risk
-- Approval: **external to files** via PR review and commit SHA binding
-- Validation: **deterministic blocking, advisory non-blocking**
-- Agent verification: **separate session required**
-- Test protection: **tests derive from approved scenarios**
-- Traceability: **strict/fail-closed** with CI enforcement
-- Tooling: **single AGENTS.md entry point** + optional thin adapters
-- Context management: **context packs** define minimal spec loading per task
-- Reverse engineering: **behavior specs from contracts/docs**, not test conversion
-- Executable specs: **Phase P4** using existing Gherkin runners (not custom)
+- **First target:** General framework for any app
+- **Rigour:** Configurable via rigor levels (Minimal/Standard/Full) determined by risk
+- **Levels:** 4 core (Requirements, Design, Tasks, Verification) + 3 extended (Constitution, Integration, Release)
+- **Approval:** External to files via PR review and commit SHA binding
+- **Validation:** Deterministic blocking, advisory non-blocking
+- **Agent verification:** Separate session required
+- **Test protection:** Tests derive from approved scenarios
+- **Traceability:** Strict/fail-closed with CI enforcement
+- **Tooling:** Single AGENTS.md entry point, no tool-specific adapters required
+- **Context management:** Context packs define minimal spec loading per task
+- **Reverse engineering:** Behavior specs from contracts/docs, not test conversion
+- **Executable specs:** Phase P4 using existing Gherkin runners (not custom)
 
 ---
 
-## 29. Open Items
+## 30. Open Items
 
 1. ⏳ Executable spec harness design (Phase P4)
 2. ⏳ CI/CD integration implementation (Phase P2)
@@ -1358,10 +1362,10 @@ All sections use sequential numbering (1-30). Subsections use decimal notation (
 
 ---
 
-## 30. Adoption Roadmap
+## 31. Adoption Roadmap
 
 ### Phase P1: Minimal Viable Framework (MVF)
-- **Scope:** Constitution, L1, L4, L7, L8, **Rigor Levels**, **Context Packs**
+- **Scope:** L1 Requirements, L3 Tasks, L4 Verification, **Rigor Levels**, **Context Packs**
 - **Tooling:** Validator CLI (deterministic only), Template Generator, `AGENTS.md`
 - **Target:** Internal tool or simple CRUD feature (NOT auth/payment)
 - **Duration:** 4-6 weeks
@@ -1369,7 +1373,7 @@ All sections use sequential numbering (1-30). Subsections use decimal notation (
 - **Pilot choice rationale:** Internal tools have lower risk, faster feedback, no security concerns
 
 ### Phase P2: Core Framework
-- **Scope:** Add L2, L3, L5, L6, L9, L10, L11
+- **Scope:** Add L2 Design, L5 Integration, L6 Release
 - **Tooling:** Add Traceability Generator, basic CI integration
 - **Target:** Small project (3-5 features)
 - **Duration:** 2-3 months
@@ -1395,11 +1399,11 @@ All sections use sequential numbering (1-30). Subsections use decimal notation (
 
 ## Appendix A: Reference Implementation
 
-See `examples/user-login/` for a complete reference implementation following this framework.
+See `examples/user-login-v3/` for a complete reference implementation following this framework.
 
 ## Appendix B: Template Files
 
-Templates are available via `sdd-template` CLI. See Section 18.3 for usage.
+Templates are available via `sdd-template` CLI. See Section 19.3 for usage.
 
 ## Appendix C: CI/CD Integration
 
@@ -1424,3 +1428,219 @@ jobs:
           # Check that code commits have Spec-Ref or Bug-Ref
           git log --format='%B' | grep -E 'Spec-Ref:|Bug-Ref:' || exit 1
 ```
+
+## Appendix D: Distribution Strategy
+
+### Package Structure
+
+The framework is distributed as an npm package `@sdd/framework`:
+
+```
+@sdd/framework/
+├── package.json
+├── bin/
+│   ├── sdd-validate.js      # Spec validator CLI
+│   ├── sdd-template.js      # Template generator CLI
+│   ├── sdd-trace.js         # Traceability generator CLI
+│   └── sdd-init.js          # Project initializer CLI
+├── templates/
+│   ├── requirements.md      # L1 template
+│   ├── design.md            # L2 template
+│   ├── task.md              # L3 template
+│   └── verification.md      # L4 template
+├── workflows/
+│   └── sdd-validate.yml     # GitHub Actions workflow
+├── SDD-Framework.md         # Framework documentation
+└── README.md                # Package documentation
+```
+
+### Installation
+
+**Global installation:**
+```bash
+npm install -g @sdd/framework
+```
+
+**Project-level installation:**
+```bash
+npm install --save-dev @sdd/framework
+```
+
+### Usage
+
+**Initialize new project:**
+```bash
+sdd-init my-project
+cd my-project
+```
+
+**Generate specs:**
+```bash
+sdd-template L1-requirements specs/requirements/requirements.md
+sdd-template L2-design specs/design/architecture.md
+sdd-template L3-task specs/tasks/task-001.md
+sdd-template L4-verification specs/verification/test-plan.md
+```
+
+**Validate specs:**
+```bash
+sdd-validate specs/ --ci
+```
+
+**Generate traceability:**
+```bash
+sdd-trace specs/ traceability.yaml
+```
+
+### Configuration
+
+Each project configures the framework via:
+
+**`AGENTS.md`** (Project root):
+```markdown
+# AI Agent Instructions
+
+## Framework Version
+SDD-F v3.0
+
+## Project-Specific Configuration
+- **Rigor Level:** Standard
+- **SDD Coverage Paths:** src/api/, src/services/
+- **Evidence Retention:** 90 days
+- **Context Pack Limits:** Small=8K, Medium=16K, Large=24K
+
+## Team Configuration
+- **Product Owner:** Jane Smith
+- **Tech Lead:** John Doe
+- **QA Lead:** Emily Brown
+```
+
+**`.sdd/config.json`** (Optional):
+```json
+{
+  "frameworkVersion": "3.0.0",
+  "rigorLevel": "standard",
+  "coveragePaths": ["src/api/", "src/services/"],
+  "evidenceRetention": 90,
+  "contextLimits": {
+    "small": 8000,
+    "medium": 16000,
+    "large": 24000
+  },
+  "team": {
+    "productOwner": "Jane Smith",
+    "techLead": "John Doe",
+    "qaLead": "Emily Brown"
+  }
+}
+```
+
+### CI/CD Integration
+
+The package includes a GitHub Actions workflow template at `workflows/sdd-validate.yml`. To use:
+
+1. Copy the workflow to your project:
+```bash
+mkdir -p .github/workflows
+cp node_modules/@sdd/framework/workflows/sdd-validate.yml .github/workflows/
+```
+
+2. The workflow automatically runs on PRs and pushes to main/develop branches.
+
+### Version Management
+
+- **Major version** (3.x → 4.x): Breaking changes, level restructuring
+- **Minor version** (3.0 → 3.1): New features, backward compatible
+- **Patch version** (3.0.0 → 3.0.1): Bug fixes
+
+Projects pin the framework version in `AGENTS.md` and can upgrade independently.
+
+### Migration
+
+Migration guides are provided for major version upgrades. See Appendix D for v2.1 → v3.0 migration.
+
+---
+
+## Appendix E: Migration from v2.1
+
+### Level Mapping
+
+| v2.1 Level | v3.0 Level | Notes |
+|---|---|---|
+| L0 Constitution | L0 Constitution | Unchanged (optional) |
+| L1 Business Case | L1 Requirements | Merged with L2 |
+| L2 Business Spec | L1 Requirements | Merged with L1 |
+| L3 Capability Design | L2 Design | Merged with L4 |
+| L4 Feature Design | L2 Design | Merged with L3 |
+| L5 Tech Spec | L2 Design | Merged into design specs |
+| L6 Work Breakdown | L3 Tasks | Merged with L7 |
+| L7 Task Spec | L3 Tasks | Merged with L6 |
+| L8 Test Plan | L4 Verification | Merged with L9 |
+| L9 Impl Spec | L4 Verification | Merged with L8 |
+| L10 Integration | L5 Integration | Unchanged (optional) |
+| L11 Release | L6 Release | Unchanged (optional) |
+
+### File Structure Migration
+
+**v2.1:**
+```
+specs/
+  00-business-case.md
+  01-business-spec/
+  20-capabilities/
+  30-features/
+  40-tech/
+  50-work-breakdown.md
+  60-tasks/
+  70-tests/
+  80-integration/
+  90-distill/
+```
+
+**v3.0:**
+```
+specs/
+  requirements/
+    business-case.md (optional)
+    requirements.md
+    scenarios.md
+    actors.md (optional)
+    rules.md (optional)
+    open-questions.md
+  design/
+    architecture.md (optional)
+    feature-specs/
+    data-model.md (optional)
+    security.md (optional)
+  tasks/
+    backlog.md
+    task-<ID>.md
+  verification/
+    test-plan.md
+    evidence/
+  integration/ (optional)
+  release/ (optional)
+```
+
+### ID Prefix Changes
+
+| v2.1 | v3.0 | Notes |
+|---|---|---|
+| BC | REQ | Business case → Requirements |
+| ACT | - | Actors optional, may use REQ |
+| JRN | - | Journeys optional, may use SCN |
+| BR | - | Rules optional, may use REQ |
+| BSC | BSC | Business scenarios (optional) |
+| CAP | - | Capabilities optional, may use ARCH |
+| ADR | ADR | Architecture decisions (optional) |
+| FR | FR | Functional requirements |
+| NFR | NFR | Non-functional requirements |
+| SCN | SCN | Scenarios |
+| ST | - | Stories merged into tasks |
+| TSK | TSK | Tasks |
+| TST | TST | Tests |
+| IMPL | IMPL | Implementation specs (optional) |
+| INT | INT | Integration (optional) |
+| REL | REL | Release (optional) |
+| BUG | BUG | Bugs |
+| D | D | Decisions |
