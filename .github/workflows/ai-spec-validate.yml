@@ -9,6 +9,11 @@ on:
 env:
   SPECS_DIR: examples/user-login-v3/specs
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
 jobs:
   validate-specs:
     runs-on: ubuntu-latest
